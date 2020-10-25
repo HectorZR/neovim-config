@@ -50,6 +50,7 @@ Plug 'ryanoasis/vim-devicons'
 " coc-json
 
 " THEMES
+Plug 'rafi/awesome-vim-colorschemes'
 Plug 'kaicataldo/material.vim'
 Plug 'joshdick/onedark.vim'
 

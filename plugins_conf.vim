@@ -3,7 +3,7 @@
 " ---------------
 
 " THEME SELECTION
-silent! colorscheme material
+silent! colorscheme onedark
 
 " NERDTree options
 let NERDTreeQuitOnOpen=1
@@ -27,7 +27,7 @@ else
 endif
 
 " vim-airline options
-let g:airline_theme='simple'
+let g:airline_theme='molokai'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
