@@ -27,12 +27,15 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion' "move faster in a file
 " Plug 'eugen0329/vim-esearch' " multifiles find and replace
+Plug 'ctrlpvim/ctrlp.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
-" Plug 'majutsushi/tagbar' "need CTags dependency
+Plug 'majutsushi/tagbar' "need CTags dependency
+Plug 'tpope/vim-fugitive'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mxw/vim-jsx'
 Plug 'dart-lang/dart-vim-plugin'
+Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'ryanoasis/vim-devicons'
 
 " List of coc plugins I use

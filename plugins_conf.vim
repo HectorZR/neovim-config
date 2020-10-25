@@ -80,10 +80,14 @@ let g:python_recommended_style = 0
 " ----------------
 
 " NERDTree mappings
-map <silent> <C-m> :NERDTreeToggle<CR>
+map <silent> <leader>m :NERDTreeToggle<CR>
 
 " fzf mappings
 " nnoremap <silent> <leader>e :FZF -m<CR>
 
 " easymotion mappings
+
+
+" tagbar mappings
+nmap <silent> <F8> :TagbarToggle<CR>
 
