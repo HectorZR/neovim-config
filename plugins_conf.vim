@@ -70,6 +70,8 @@ else
   let g:airline_symbols.linenr = ''
 endif
 
+" coc-python options
+let g:python_recommended_style = 0 
 
 
 

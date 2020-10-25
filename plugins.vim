@@ -44,6 +44,7 @@ Plug 'ryanoasis/vim-devicons'
 " coc-python
 " coc-css
 " coc-markdownlint
+" coc-json
 
 " THEMES
 Plug 'kaicataldo/material.vim'
