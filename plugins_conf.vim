@@ -16,8 +16,8 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 50
 
 " fzf options
-set wildmode=list:longest,list:full
-set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,*/node_modules/**,*/vendor/**
+" set wildmode=list:longest,list:full
+" set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,*/node_modules/**,*/vendor/**
 
 if g:is_win
 	let $FZF_DEFAULT_COMMAND = "dir /s /b"
@@ -83,7 +83,7 @@ let g:python_recommended_style = 0
 map <silent> <C-m> :NERDTreeToggle<CR>
 
 " fzf mappings
-nnoremap <silent> <leader>e :FZF -m<CR>
+" nnoremap <silent> <leader>e :FZF -m<CR>
 
 " easymotion mappings
 

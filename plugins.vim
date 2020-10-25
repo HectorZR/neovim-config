@@ -21,12 +21,12 @@ call plug#begin(g:PLUGIN_HOME)
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'airblade/vim-gitgutter'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion' "move faster in a file
-Plug 'eugen0329/vim-esearch' " multifiles find and replace
+" Plug 'eugen0329/vim-esearch' " multifiles find and replace
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 " Plug 'majutsushi/tagbar' "need CTags dependency
