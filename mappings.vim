@@ -9,6 +9,7 @@ if g:is_win
 	nmap <leader>sou :source ~/AppData/Local/nvim/init.vim <CR>
 else 
 	nmap <leader>sou :source ~/.config/nvim/init.vim <CR>
+endif
 
 " Copy text to system clipboard
 vnoremap y "+y
