@@ -31,7 +31,7 @@ nnoremap L g_
 xnoremap L g_
 
 " Clean search
-nmap <leader>n :noh <CR>
+nmap <silent> <leader>n :noh <CR>
 
 " Move between split terminals
 nmap <silent> <A-k> :wincmd k<CR>
@@ -49,3 +49,13 @@ nnoremap <silent> <Leader><Down> :resize +10<CR>
 map <silent> <Tab> :bnext<CR>
 map <silent> <S-Tab> :bprevious<CR>
 
+" Manipulate insert line
+nnoremap <leader>o o<Esc>
+nnoremap <leader>O O<Esc>
+
+" Map scroll
+map <silent> <C-UP> <C-Y>
+map <silent> <C-Down> <C-E>
+
+" Move between words
+imap <C-l> <C-Right>
