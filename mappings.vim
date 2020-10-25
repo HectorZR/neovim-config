@@ -3,7 +3,12 @@ let mapleader = ' '
 
 nmap <silent> <leader>w :w<CR>
 nmap <silent> <leader>q :bdelete<CR>
-nmap <leader>sou :source ~/AppData/Local/nvim/init.vim <CR>
+
+" Refresh neovim configs from everywhere
+if g:is_win
+	nmap <leader>sou :source ~/AppData/Local/nvim/init.vim <CR>
+else 
+	nmap <leader>sou :source ~/.config/nvim/init.vim <CR>
 
 " Copy text to system clipboard
 vnoremap y "+y
