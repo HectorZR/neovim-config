@@ -36,18 +36,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mxw/vim-jsx'
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
+Plug 'terryma/vim-multiple-cursors'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'ryanoasis/vim-devicons'
 
-" List of coc plugins I use
-" coc-phpls
-" coc-tsserver
-" coc-html
-" coc-flutter
-" coc-go
-" coc-python
-" coc-css
-" coc-markdownlint
-" coc-json
+
 
 " THEMES
 Plug 'rafi/awesome-vim-colorschemes'

@@ -3,7 +3,15 @@
 " ---------------
 
 " THEME SELECTION
-silent! colorscheme onedark
+silent! colorscheme material
+
+" Material theme options
+let g:material_theme_style = 'darker-community'
+let g:material_terminal_italics = 1
+
+if (has('termguicolors'))
+  set termguicolors
+endif
 
 " NERDTree options
 let NERDTreeQuitOnOpen=1
@@ -27,7 +35,7 @@ else
 endif
 
 " vim-airline options
-let g:airline_theme='molokai'
+let g:airline_theme='material'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
@@ -70,6 +78,20 @@ else
   let g:airline_symbols.linenr = ''
 endif
 
+" coc plugins autoinstall
+" List of coc plugins I use
+let g:coc_global_extensions = [
+	\ 'coc-phpls',
+	\ 'coc-tsserver',
+	\ 'coc-html',
+	\ 'coc-flutter',
+	\ 'coc-go',
+	\ 'coc-python',
+	\ 'coc-css',
+	\ 'coc-markdownlint',
+	\ 'coc-json',
+	\ 'coc-emmet',
+\]
 " coc-python options
 let g:python_recommended_style = 0 
 
