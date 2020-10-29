@@ -60,3 +60,7 @@ map <silent> <C-Down> <C-E>
 
 " Move between words
 imap <C-l> <C-Right>
+
+" Select all file
+nmap <C-a> ggvG<S-l>
+

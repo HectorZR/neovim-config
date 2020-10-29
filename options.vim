@@ -24,7 +24,7 @@ set mouse=nic
 set cursorline " remark current line
 
 set hidden " change buffers without save
-set undofile
+" set undofile
 
 set fileencoding=utf-8
 set spelllang=en,es
