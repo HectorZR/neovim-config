@@ -38,6 +38,7 @@ Plug 'dart-lang/dart-vim-plugin'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
 Plug 'maxmellon/vim-jsx-pretty'
+Plug 'pangloss/vim-javascript'
 Plug 'ryanoasis/vim-devicons'
 
 

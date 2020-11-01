@@ -93,6 +93,7 @@ let g:coc_global_extensions = [
 	\ 'coc-emmet',
 	\ 'coc-prettier',
 \]
+
 " coc-python options
 let g:python_recommended_style = 0 
 

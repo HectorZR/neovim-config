@@ -39,3 +39,9 @@ set wildignore+=*.aux,*.bbl,*.blg,*.brf,*.fls,*.fdb_latexmk,*.synctex.gz
 " Ask for confirmation on unsaved or read-only files
 set confirm
  
+" Improve css highlighting
+augroup VimCSS3Syntax
+  autocmd!
+
+  autocmd FileType css setlocal iskeyword+=-
+augroup END
