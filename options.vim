@@ -18,6 +18,7 @@ syntax on
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
+set expandtab
 
 set scrolloff=3
 set mouse=nic
@@ -31,7 +32,7 @@ set spelllang=en,es
 
 " Ignore certain files and folders when globbing
 set wildignore+=*.o,*.obj,*.bin,*.dll,*.exe
-set wildignore+=*/.git/*,*/.svn/*,*/__pycache__/*,*/build/**,*/node_modules/**,*/vendor/**
+set wildignore+=*/.git/*,*/.svn/*,*/__pycache__/*,*/build/**,*/node_modules/*,*/vendor/*,*/coverage/*
 set wildignore+=*.pyc
 set wildignore+=*.DS_Store
 set wildignore+=*.aux,*.bbl,*.blg,*.brf,*.fls,*.fdb_latexmk,*.synctex.gz

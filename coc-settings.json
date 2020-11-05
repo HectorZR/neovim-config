@@ -1,13 +1,18 @@
 {
-  "coc.preferences.formatOnSaveFiletypes": [
-    "css",
-    "javascript",
-    "javascriptreact",
-    "typescriptreact",
-    "typescript",
-    "json",
-    "markdown"
-  ],
-  "prettier.useTabs": true,
-  "prettier.singleQuote": true
+	"coc.preferences.formatOnSaveFiletypes": [
+		"css",
+		"javascript",
+		"javascriptreact",
+		"typescriptreact",
+		"typescript",
+		"json",
+		"markdown",
+		"python",
+		"php",
+		"dart",
+		"go"
+	],
+	"python.formatting.provider": "autopep8",
+	"prettier.useTabs": true,
+	"prettier.singleQuote": true
 }
