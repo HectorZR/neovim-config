@@ -25,11 +25,9 @@ let g:NERDTreeWinSize = 50
 
 " fzf options
 " set wildmode=list:longest,list:full
-" set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,*/node_modules/**,*/vendor/**
+set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,node_modules,vendor,coverage
 
-if g:is_win
-	let $FZF_DEFAULT_COMMAND = "dir /s /b"
-else
+if !g:is_win
 	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path '*/vendor/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 endif
@@ -97,6 +95,10 @@ let g:coc_global_extensions = [
 " coc-python options
 let g:python_recommended_style = 0 
 
+" vim-javascript options
+let g:javascript_plugin_jsdoc = 1
+
+
 
 
 " ----------------
@@ -107,7 +109,8 @@ let g:python_recommended_style = 0
 map <silent> <leader>m :NERDTreeToggle<CR>
 
 " fzf mappings
-" nnoremap <silent> <leader>e :FZF -m<CR>
+nnoremap <silent> <C-p> :FZF -m<CR>
+nnoremap <silent> <C-G> :Ag <CR>
 
 " easymotion mappings
 

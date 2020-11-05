@@ -21,24 +21,36 @@ call plug#begin(g:PLUGIN_HOME)
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'airblade/vim-gitgutter'
-" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion' "move faster in a file
 " Plug 'eugen0329/vim-esearch' " multifiles find and replace
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 Plug 'majutsushi/tagbar' "need CTags dependency
 Plug 'tpope/vim-fugitive'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'mxw/vim-jsx'
-Plug 'dart-lang/dart-vim-plugin'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
+" Plug 'alvan/vim-closetag'
+
+" Server Language
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Javascript Syntax Highlighting
+Plug 'mxw/vim-jsx'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'pangloss/vim-javascript'
+
+" Dart Syntax Highlighting
+Plug 'dart-lang/dart-vim-plugin'
+
+" Python Syntax Highlighting
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+
+" File Icons
 Plug 'ryanoasis/vim-devicons'
 
 
