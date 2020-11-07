@@ -15,10 +15,16 @@ set ignorecase
 set smartcase
 syntax on
 
+" General tab size config
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set expandtab
+
+" Set php tabs size
+autocmd Filetype php setlocal tabstop=4
+autocmd Filetype php setlocal softtabstop=4
+autocmd Filetype php setlocal shiftwidth=4
 
 set scrolloff=3
 set mouse=nic
@@ -40,9 +46,6 @@ set wildignore+=*.aux,*.bbl,*.blg,*.brf,*.fls,*.fdb_latexmk,*.synctex.gz
 " Ask for confirmation on unsaved or read-only files
 set confirm
  
-" Improve css highlighting
-augroup VimCSS3Syntax
-  autocmd!
+" Improve css syntax
+autocmd FileType css setlocal iskeyword+=-
 
-  autocmd FileType css setlocal iskeyword+=-
-augroup END
