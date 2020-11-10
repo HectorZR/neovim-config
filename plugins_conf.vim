@@ -3,11 +3,13 @@
 " ---------------
 
 " THEME SELECTION
-silent! colorscheme material
+silent! colorscheme gruvbox
 
 " Material theme options
-let g:material_theme_style = 'darker-community'
-let g:material_terminal_italics = 1
+if g:colors_name is 'material'
+  let g:material_theme_style = 'darker-community'
+  let g:material_terminal_italics = 1
+endif
 
 if (has('termguicolors'))
   set termguicolors
@@ -28,7 +30,7 @@ let g:NERDTreeWinSize = 50
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,node_modules,vendor,coverage
 
 if !g:is_win
-	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path '*/vendor/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path '*/vendor/**' -prune -o -path 'coverage/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 endif
 
