@@ -27,7 +27,6 @@ Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion' "move faster in a file
-" Plug 'eugen0329/vim-esearch' " multifiles find and replace
 " Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 Plug 'majutsushi/tagbar' "need CTags dependency
@@ -35,7 +34,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
 Plug 'wakatime/vim-wakatime'
-" Plug 'alvan/vim-closetag'
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
