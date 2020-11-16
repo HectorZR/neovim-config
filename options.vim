@@ -26,6 +26,11 @@ autocmd Filetype php setlocal tabstop=4
 autocmd Filetype php setlocal softtabstop=4
 autocmd Filetype php setlocal shiftwidth=4
 
+" Set Python tabs size
+autocmd Filetype python setlocal tabstop=4
+autocmd Filetype python setlocal softtabstop=4
+autocmd Filetype python setlocal shiftwidth=4
+
 set scrolloff=3
 set mouse=nic
 set cursorline " remark current line

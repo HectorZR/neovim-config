@@ -8,7 +8,7 @@ nmap <silent> <leader>q :bdelete<CR>
 if g:is_win
 	nmap <leader>sou :source ~/AppData/Local/nvim/init.vim <CR>
 else 
-	nmap <leader>sou :source ~/.config/nvim/init.vim <CR>
+  nmap <leader>sou :source ~/.config/nvim/init.vim <CR> 
 endif
 
 " Copy text to system clipboard
@@ -63,4 +63,12 @@ imap <C-l> <C-Right>
 
 " Select all file
 nmap <C-a> ggvG<S-l>
+
+" Integrated Terminal
+function! OpenTerminal()
+  split term://zsh
+  resize 10
+endfunction
+
+nnoremap <c-t> :call OpenTerminal()<CR>
 

@@ -34,6 +34,7 @@ Plug 'majutsushi/tagbar' "need CTags dependency
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
+Plug 'wakatime/vim-wakatime'
 " Plug 'alvan/vim-closetag'
 
 " Server Language
