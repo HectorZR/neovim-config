@@ -35,7 +35,7 @@ if !g:is_win
 endif
 
 " vim-airline options
-let g:airline_theme='material'
+let g:airline_theme='minimalist'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
@@ -95,9 +95,6 @@ let g:coc_global_extensions = [
 	\ 'coc-emmet',
 	\ 'coc-prettier',
 \]
-
-" coc options
-set updatetime=500
 
 " coc-python options
 let g:python_recommended_style = 0 
@@ -163,6 +160,8 @@ nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<
 inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
 inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
 
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+				\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " tagbar mappings
 nmap <silent> <F8> :TagbarToggle<CR>

@@ -27,7 +27,6 @@ Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion' "move faster in a file
-" Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 Plug 'majutsushi/tagbar' "need CTags dependency
 Plug 'tpope/vim-fugitive'
@@ -48,6 +47,9 @@ Plug 'dart-lang/dart-vim-plugin'
 
 " Python Syntax Highlighting
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+
+" Golang Syntax Highlighting
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " File Icons
 Plug 'ryanoasis/vim-devicons'
