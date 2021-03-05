@@ -33,17 +33,26 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
 Plug 'wakatime/vim-wakatime'
+Plug 'editorconfig/editorconfig-vim'
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+" Typescript Syntax Highlighting
+Plug 'HerringtonDarkholme/yats.vim'
+
 " Javascript Syntax Highlighting
-Plug 'mxw/vim-jsx'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'pangloss/vim-javascript'
 
 " Dart Syntax Highlighting
 Plug 'dart-lang/dart-vim-plugin'
+
+" Flutter plugins
+Plug 'thosakwe/vim-flutter'
+
+" Kotlin plugins
+Plug 'udalov/kotlin-vim'
 
 " Python Syntax Highlighting
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}

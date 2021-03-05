@@ -94,6 +94,7 @@ let g:coc_global_extensions = [
 	\ 'coc-json',
 	\ 'coc-emmet',
 	\ 'coc-prettier',
+  \ 'coc-kotlin',
 \]
 
 " coc-python options
@@ -111,6 +112,7 @@ let g:javascript_plugin_jsdoc = 1
 
 " NERDTree mappings
 map <silent> <leader>m :NERDTreeToggle<CR>
+map <silent> <leader>c :NERDTreeFind<CR>
 
 " fzf mappings
 nnoremap <silent> <C-p> :FZF -m<CR>
@@ -166,3 +168,5 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 " tagbar mappings
 nmap <silent> <F8> :TagbarToggle<CR>
 
+" GitGutter mappings
+nmap <silent> gp :GitGutterPreviewHunk<CR>

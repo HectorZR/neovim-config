@@ -10,27 +10,25 @@ set noshowmode
 set noswapfile
 set updatetime=500
 
-set gfn=Hack\ NerdFont\ Bold\ 11
-
 set ignorecase
 set smartcase
 syntax on
 
-" " General tab size config
-" set tabstop=2
-" set softtabstop=2
-" set shiftwidth=2
-" set expandtab
+" General tab size config
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set expandtab
 
-" " Set php tabs size
-" autocmd Filetype php setlocal tabstop=4
-" autocmd Filetype php setlocal softtabstop=4
-" autocmd Filetype php setlocal shiftwidth=4
+" Set php tabs size
+autocmd Filetype php setlocal tabstop=4
+autocmd Filetype php setlocal softtabstop=4
+autocmd Filetype php setlocal shiftwidth=4
 
-" " Set Python tabs size
-" autocmd Filetype python setlocal tabstop=4
-" autocmd Filetype python setlocal softtabstop=4
-" autocmd Filetype python setlocal shiftwidth=4
+" Set Python tabs size
+autocmd Filetype python setlocal tabstop=4
+autocmd Filetype python setlocal softtabstop=4
+autocmd Filetype python setlocal shiftwidth=4
 
 set scrolloff=3
 set mouse=nic
