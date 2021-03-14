@@ -68,6 +68,5 @@ Plug 'ryanoasis/vim-devicons'
 " THEMES
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'kaicataldo/material.vim'
-Plug 'joshdick/onedark.vim'
 
 call plug#end()

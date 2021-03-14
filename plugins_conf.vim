@@ -3,7 +3,7 @@
 " ---------------
 
 " THEME SELECTION
-silent! colorscheme gruvbox
+silent! colorscheme onedark
 
 " Material theme options
 if g:colors_name is 'material'
