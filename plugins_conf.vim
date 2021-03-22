@@ -23,7 +23,7 @@ let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
 let g:NERDTreeShowBookmarks=1
 let g:nerdtree_tabs_focus_on_files=1
 let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
-let g:NERDTreeWinSize = 50
+let g:NERDTreeWinSize = 35
 
 " fzf options
 " set wildmode=list:longest,list:full
@@ -35,7 +35,7 @@ if !g:is_win
 endif
 
 " vim-airline options
-let g:airline_theme='minimalist'
+let g:airline_theme='murmur'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
