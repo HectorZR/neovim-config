@@ -2,7 +2,7 @@
 " PLUGINS OPTIONS
 " ---------------
 
-" THEME SELECTION
+" THEME SELECTION 
 silent! colorscheme onedark
 
 " Material theme options
@@ -30,53 +30,68 @@ let g:NERDTreeWinSize = 35
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,node_modules,vendor,coverage
 
 if !g:is_win
-	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path '*/vendor/**' -prune -o -path 'coverage/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'vendor/**' -prune -o -path 'coverage/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 endif
 
-" vim-airline options
-let g:airline_theme='murmur'
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-let g:airline#extensions#tagbar#enabled = 1
-let g:airline_skip_empty_sections = 1
-let g:airline_powerline_fonts = 1
+" vim lightline options
+let g:lightline = {
+  \ 'colorscheme': 'one',
+  \ 'active': {
+  \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'gitbranch'] ],
+  \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
+  \ },
+  \ 'tabline': {
+  \   'left': [ ['buffers'] ],
+  \   'right': [ ['close'] ]
+  \ },
+  \ 'separator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
+  \ 'subseparator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
+  \ 'tabline_separator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
+  \ 'tabline_subseparator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
+  \ 'component': {
+  \ },
+  \ 'component_expand': {
+  \   'buffers': 'lightline#bufferline#buffers'
+  \ },
+  \ 'component_type': {
+  \   'buffers': 'tabsel'
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'LightlineGitbranch',
+  \   'lineinfo': 'LightlineLineinfo',
+  \ }
+  \ }
 
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
+let g:lightline#bufferline#filename_modifier = ':t:r'
+let g:lightline#bufferline#show_number  = 2
+let g:lightline#bufferline#unnamed = 'No Name'
+let g:lightline#bufferline#enable_devicons = 1
+let g:lightline#bufferline#unicode_symbols = 1
 
-if !exists('g:airline_powerline_fonts')
-  let g:airline#extensions#tabline#left_sep = ' '
-  let g:airline#extensions#tabline#left_alt_sep = '|'
-  let g:airline_left_sep          = '▶'
-  let g:airline_left_alt_sep      = '»'
-  let g:airline_right_sep         = '◀'
-  let g:airline_right_alt_sep     = '«'
-  let g:airline#extensions#branch#prefix     = '⤴' "➔, ➥, ⎇
-  let g:airline#extensions#readonly#symbol   = '⊘'
-  let g:airline#extensions#linecolumn#prefix = '¶'
-  let g:airline#extensions#paste#symbol      = 'ρ'
-  let g:airline_symbols.linenr    = '␊'
-  let g:airline_symbols.branch    = '⎇'
-  let g:airline_symbols.paste     = 'ρ'
-  let g:airline_symbols.paste     = 'Þ'
-  let g:airline_symbols.paste     = '∥'
-  let g:airline_symbols.whitespace = 'Ξ'
-else
-  let g:airline#extensions#tabline#left_sep = ''
-  let g:airline#extensions#tabline#left_alt_sep = ''
+function! LightlineGitbranch() abort
+    if exists('*fugitive#head')
+        let branch = fugitive#head()
+        return branch !=# '' ? branch . ' ' : ''
+   endif
+    return fugitive#head()
+endfunction
 
-  " powerline symbols
-  let g:airline_left_sep = ''
-  let g:airline_left_alt_sep = ''
-  let g:airline_right_sep = ''
-  let g:airline_right_alt_sep = ''
-  let g:airline_symbols.branch = ''
-  let g:airline_symbols.readonly = ''
-  let g:airline_symbols.linenr = ''
-endif
+function! LightlineLineinfo()
+  return col('.') . ':' . line('.') . '/' . line('$')
+endfunction
 
 " coc plugins autoinstall
 " List of coc plugins I use
@@ -119,6 +134,29 @@ nnoremap <silent> <C-p> :FZF -m<CR>
 nnoremap <silent> <C-G> :Ag <CR>
 
 " easymotion mappings
+
+" lightline mappings
+nmap <Leader>1 <Plug>lightline#bufferline#go(1)
+nmap <Leader>2 <Plug>lightline#bufferline#go(2)
+nmap <Leader>3 <Plug>lightline#bufferline#go(3)
+nmap <Leader>4 <Plug>lightline#bufferline#go(4)
+nmap <Leader>5 <Plug>lightline#bufferline#go(5)
+nmap <Leader>6 <Plug>lightline#bufferline#go(6)
+nmap <Leader>7 <Plug>lightline#bufferline#go(7)
+nmap <Leader>8 <Plug>lightline#bufferline#go(8)
+nmap <Leader>9 <Plug>lightline#bufferline#go(9)
+nmap <Leader>0 <Plug>lightline#bufferline#go(10)
+
+nmap <Leader>d1 <Plug>lightline#bufferline#delete(1)
+nmap <Leader>d2 <Plug>lightline#bufferline#delete(2)
+nmap <Leader>d3 <Plug>lightline#bufferline#delete(3)
+nmap <Leader>d4 <Plug>lightline#bufferline#delete(4)
+nmap <Leader>d5 <Plug>lightline#bufferline#delete(5)
+nmap <Leader>d6 <Plug>lightline#bufferline#delete(6)
+nmap <Leader>d7 <Plug>lightline#bufferline#delete(7)
+nmap <Leader>d8 <Plug>lightline#bufferline#delete(8)
+nmap <Leader>d9 <Plug>lightline#bufferline#delete(9)
+nmap <Leader>d0 <Plug>lightline#bufferline#delete(10)
 
 " coc mappings
 if has('nvim')

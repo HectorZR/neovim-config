@@ -9,6 +9,7 @@ set ruler
 set noshowmode
 set noswapfile
 set updatetime=500
+set showtabline=2
 
 set ignorecase
 set smartcase
