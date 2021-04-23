@@ -30,7 +30,7 @@ let g:NERDTreeWinSize = 35
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__,node_modules,vendor,coverage
 
 if !g:is_win
-	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'vendor/**' -prune -o -path 'coverage/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+	let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*/*' -prune -o -path 'null/**' -prune -o -path 'vendor/**' -prune -o -path 'coverage/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 endif
 
@@ -72,6 +72,9 @@ let g:lightline = {
   \ 'component_function': {
   \   'gitbranch': 'LightlineGitbranch',
   \   'lineinfo': 'LightlineLineinfo',
+  \ },
+  \ 'component_raw': {
+  \   'buffers': 1
   \ }
   \ }
 
@@ -80,11 +83,12 @@ let g:lightline#bufferline#show_number  = 2
 let g:lightline#bufferline#unnamed = 'No Name'
 let g:lightline#bufferline#enable_devicons = 1
 let g:lightline#bufferline#unicode_symbols = 1
+let g:lightline#bufferline#clickable = 1
 
 function! LightlineGitbranch() abort
     if exists('*fugitive#head')
         let branch = fugitive#head()
-        return branch !=# '' ? branch . ' ' : ''
+        return branch !=# '' ? branch[0:35] . ' ' : ''
    endif
     return fugitive#head()
 endfunction
@@ -110,6 +114,7 @@ let g:coc_global_extensions = [
 	\ 'coc-emmet',
 	\ 'coc-prettier',
   \ 'coc-kotlin',
+  \ 'coc-eslint'
 \]
 
 " coc-python options
@@ -208,3 +213,6 @@ nmap <silent> <F8> :TagbarToggle<CR>
 
 " GitGutter mappings
 nmap <silent> gp :GitGutterPreviewHunk<CR>
+
+" JSDoc mappings
+nmap <silent> <C-l> <Plug>(jsdoc)

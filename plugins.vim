@@ -44,6 +44,10 @@ Plug 'HerringtonDarkholme/yats.vim'
 " Javascript Syntax Highlighting
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'pangloss/vim-javascript'
+Plug 'heavenshell/vim-jsdoc', { 
+  \ 'for': ['javascript', 'javascript.jsx','typescript'], 
+  \ 'do': 'make install'
+\}
 
 " Dart Syntax Highlighting
 Plug 'dart-lang/dart-vim-plugin'
