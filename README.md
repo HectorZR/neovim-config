@@ -12,65 +12,65 @@ License MIT.
 
 ### General neovim functionalities
 
-'preservim/nerdtree'
-'Xuyuanp/nerdtree-git-plugin'
-'airblade/vim-gitgutter'
-'junegunn/fzf'
-'junegunn/fzf.vim'
-'tpope/vim-commentary'
-'itchyny/lightline.vim'
-'mengelbrecht/lightline-bufferline'
-'easymotion/vim-easymotion' // move faster in a file
-'tpope/vim-surround'
-'majutsushi/tagbar' // need CTags dependency
-'tpope/vim-fugitive'
-'tpope/vim-rhubarb' // required by fugitive to :Gbrowse
-'terryma/vim-multiple-cursors'
-'wakatime/vim-wakatime'
-'editorconfig/editorconfig-vim'
+- 'preservim/nerdtree'
+- 'Xuyuanp/nerdtree-git-plugin'
+- 'airblade/vim-gitgutter'
+- 'junegunn/fzf'
+- 'junegunn/fzf.vim'
+- 'tpope/vim-commentary'
+- 'itchyny/lightline.vim'
+- 'mengelbrecht/lightline-bufferline'
+- 'easymotion/vim-easymotion' // move faster in a file
+- 'tpope/vim-surround'
+- 'majutsushi/tagbar' // need CTags dependency
+- 'tpope/vim-fugitive'
+- 'tpope/vim-rhubarb' // required by fugitive to :Gbrowse
+- 'terryma/vim-multiple-cursors'
+- 'wakatime/vim-wakatime'
+- 'editorconfig/editorconfig-vim'
 
 ### Server Language to add language linter
 
-'neoclide/coc.nvim'
+- 'neoclide/coc.nvim'
 
 ### Typescript Syntax Highlighting
 
-'HerringtonDarkholme/yats.vim'
+- 'HerringtonDarkholme/yats.vim'
 
 ### Javascript Syntax Highlighting
 
-'maxmellon/vim-jsx-pretty'
-'pangloss/vim-javascript'
-'heavenshell/vim-jsdoc'
+- 'maxmellon/vim-jsx-pretty'
+- 'pangloss/vim-javascript'
+- 'heavenshell/vim-jsdoc'
 
 ### Dart Syntax Highlighting
 
-'dart-lang/dart-vim-plugin'
+- 'dart-lang/dart-vim-plugin'
 
 ### Flutter plugins
 
-'thosakwe/vim-flutter'
+- 'thosakwe/vim-flutter'
 
 ### Kotlin plugins
 
-'udalov/kotlin-vim'
+- 'udalov/kotlin-vim'
 
 ### Python Syntax Highlighting
 
-'numirias/semshi'
+- 'numirias/semshi'
 
 ### Golang Syntax Highlighting
 
-'fatih/vim-go'
+- 'fatih/vim-go'
 
 ### File Icons
 
-'ryanoasis/vim-devicons'
+- 'ryanoasis/vim-devicons'
 
 ### THEMES
 
-'rafi/awesome-vim-colorschemes'
-'kaicataldo/material.vim'
+- 'rafi/awesome-vim-colorschemes'
+- 'kaicataldo/material.vim'
 
 ## Custom Vim Mappings
 
