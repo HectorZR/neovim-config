@@ -33,13 +33,14 @@ autocmd Filetype python setlocal softtabstop=4
 autocmd Filetype python setlocal shiftwidth=4
 
 set scrolloff=3
-set mouse=nic
+set mouse=na
 set cursorline " remark current line
 
 set hidden " change buffers without save
 " set undofile
 
 set fileencoding=utf-8
+set encoding=utf8
 set spelllang=en,es
 
 " Ignore certain files and folders when globbing

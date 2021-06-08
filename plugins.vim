@@ -34,6 +34,7 @@ Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
 Plug 'terryma/vim-multiple-cursors'
 Plug 'wakatime/vim-wakatime'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'Yggdroot/indentLine'
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}

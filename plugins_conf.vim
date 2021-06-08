@@ -3,7 +3,7 @@
 " ---------------
 
 " THEME SELECTION 
-silent! colorscheme onedark
+silent! colorscheme gruvbox
 
 " Material theme options
 if g:colors_name is 'material'
@@ -24,6 +24,7 @@ let g:NERDTreeShowBookmarks=1
 let g:nerdtree_tabs_focus_on_files=1
 let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 35
+let NERDTreeShowLineNumbers = 1
 
 " fzf options
 " set wildmode=list:longest,list:full
@@ -36,7 +37,7 @@ endif
 
 " vim lightline options
 let g:lightline = {
-  \ 'colorscheme': 'one',
+  \ 'colorscheme': 'material',
   \ 'active': {
   \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'gitbranch'] ],
   \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
@@ -123,6 +124,9 @@ let g:python_recommended_style = 0
 " vim-javascript options
 let g:javascript_plugin_jsdoc = 1
 
+" indentLine options
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+autocmd FileType json IndentLinesDisable
 
 
 
