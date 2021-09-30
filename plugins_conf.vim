@@ -42,6 +42,14 @@ let g:lightline = {
   \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'gitbranch'] ],
   \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
   \ },
+  \ 'separator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
+  \ 'subseparator': {
+  \   'right': '',
+  \   'left': '',
+  \ },
   \ 'component_function': {
   \   'gitbranch': 'LightlineGitbranch',
   \   'lineinfo': 'LightlineLineinfo',
