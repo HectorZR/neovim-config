@@ -42,34 +42,6 @@ let g:lightline = {
   \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'gitbranch'] ],
   \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
   \ },
-  \ 'tabline': {
-  \   'left': [ ['buffers'] ],
-  \   'right': [ ['close'] ]
-  \ },
-  \ 'separator': {
-  \   'right': '',
-  \   'left': '',
-  \ },
-  \ 'subseparator': {
-  \   'right': '',
-  \   'left': '',
-  \ },
-  \ 'tabline_separator': {
-  \   'right': '',
-  \   'left': '',
-  \ },
-  \ 'tabline_subseparator': {
-  \   'right': '',
-  \   'left': '',
-  \ },
-  \ 'component': {
-  \ },
-  \ 'component_expand': {
-  \   'buffers': 'lightline#bufferline#buffers'
-  \ },
-  \ 'component_type': {
-  \   'buffers': 'tabsel'
-  \ },
   \ 'component_function': {
   \   'gitbranch': 'LightlineGitbranch',
   \   'lineinfo': 'LightlineLineinfo',
@@ -78,13 +50,48 @@ let g:lightline = {
   \   'buffers': 1
   \ }
   \ }
+lua << EOF
+require("bufferline").setup {
+    options = {
+      numbers = "ordinal",
+      close_command = "bdelete! %d",
+      right_mouse_command = "bdelete! %d", 
+      left_mouse_command = "buffer %d",
+      middle_mouse_command = nil,
+      indicator_icon = "▎",
+      buffer_close_icon = "",
+      modified_icon = "●",
+      close_icon = "",
+      left_trunc_marker = "",
+      right_trunc_marker = "",
+      name_formatter = function(buf) -- buf contains a "name", "path" and "bufnr"
+        if buf.name:match("%.md") then
+          return vim.fn.fnamemodify(buf.name, ":t:r")
+        end
+      end,
+      max_name_length = 18,
+      max_prefix_length = 15, 
+      tab_size = 18,
+      diagnostics = "coc",
+      diagnostics_update_in_insert = false,
+      diagnostics_indicator = function(count, level, diagnostics_dict, context)
+        local icon = level:match("error") and " " or " "
+        return " " .. icon .. count
+      end,
+      offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "left"}},
+      show_buffer_icons = true,
+      show_buffer_close_icons = true,
+      show_close_icon = true,
+      show_tab_indicators = true,
+      persist_buffer_sort = true, 
+      separator_style = "slant",
+      enforce_regular_tabs = false,
+      always_show_bufferline = true,
+      sort_by = "id"
+  }
+}
 
-let g:lightline#bufferline#filename_modifier = ':t:r'
-let g:lightline#bufferline#show_number  = 2
-let g:lightline#bufferline#unnamed = 'No Name'
-let g:lightline#bufferline#enable_devicons = 1
-let g:lightline#bufferline#unicode_symbols = 1
-let g:lightline#bufferline#clickable = 1
+EOF
 
 function! LightlineGitbranch() abort
     if exists('*fugitive#head')
@@ -144,28 +151,9 @@ nnoremap <silent> <C-G> :Ag <CR>
 
 " easymotion mappings
 
-" lightline mappings
-nmap <Leader>1 <Plug>lightline#bufferline#go(1)
-nmap <Leader>2 <Plug>lightline#bufferline#go(2)
-nmap <Leader>3 <Plug>lightline#bufferline#go(3)
-nmap <Leader>4 <Plug>lightline#bufferline#go(4)
-nmap <Leader>5 <Plug>lightline#bufferline#go(5)
-nmap <Leader>6 <Plug>lightline#bufferline#go(6)
-nmap <Leader>7 <Plug>lightline#bufferline#go(7)
-nmap <Leader>8 <Plug>lightline#bufferline#go(8)
-nmap <Leader>9 <Plug>lightline#bufferline#go(9)
-nmap <Leader>0 <Plug>lightline#bufferline#go(10)
-
-nmap <Leader>d1 <Plug>lightline#bufferline#delete(1)
-nmap <Leader>d2 <Plug>lightline#bufferline#delete(2)
-nmap <Leader>d3 <Plug>lightline#bufferline#delete(3)
-nmap <Leader>d4 <Plug>lightline#bufferline#delete(4)
-nmap <Leader>d5 <Plug>lightline#bufferline#delete(5)
-nmap <Leader>d6 <Plug>lightline#bufferline#delete(6)
-nmap <Leader>d7 <Plug>lightline#bufferline#delete(7)
-nmap <Leader>d8 <Plug>lightline#bufferline#delete(8)
-nmap <Leader>d9 <Plug>lightline#bufferline#delete(9)
-nmap <Leader>d0 <Plug>lightline#bufferline#delete(10)
+" bufferline mappings
+nnoremap <silent> fj :BufferLinePick<CR>
+nnoremap <silent> fk :BufferLinePickClose<CR>
 
 " coc mappings
 if has('nvim')

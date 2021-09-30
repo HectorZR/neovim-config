@@ -56,3 +56,6 @@ set confirm
 " Improve css syntax
 autocmd FileType css setlocal iskeyword+=-
 
+" Splitting positions
+set splitbelow
+set splitright

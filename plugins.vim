@@ -25,9 +25,10 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-commentary'
 Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
+Plug 'akinsho/bufferline.nvim'
 Plug 'easymotion/vim-easymotion' "move faster in a file
 Plug 'tpope/vim-surround'
+Plug 'alvan/vim-closetag'
 Plug 'majutsushi/tagbar' "need CTags dependency
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb' " required by fugitive to :Gbrowse
@@ -35,6 +36,7 @@ Plug 'terryma/vim-multiple-cursors'
 Plug 'wakatime/vim-wakatime'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'Yggdroot/indentLine'
+Plug 'sheerun/vim-polyglot'
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -43,8 +45,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'HerringtonDarkholme/yats.vim'
 
 " Javascript Syntax Highlighting
-Plug 'maxmellon/vim-jsx-pretty'
-Plug 'pangloss/vim-javascript'
 Plug 'heavenshell/vim-jsdoc', { 
   \ 'for': ['javascript', 'javascript.jsx','typescript'], 
   \ 'do': 'make install'
@@ -67,8 +67,7 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " File Icons
 Plug 'ryanoasis/vim-devicons'
-
-
+Plug 'kyazdani42/nvim-web-devicons'
 
 " THEMES
 Plug 'rafi/awesome-vim-colorschemes'
