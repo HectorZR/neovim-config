@@ -35,10 +35,10 @@ xnoremap L g_
 nmap <silent> <leader>n :noh <CR>
 
 " Move between split terminals
-nmap <silent> <A-k> :wincmd k<CR>
-nmap <silent> <A-j> :wincmd j<CR>
-nmap <silent> <A-h> :wincmd h<CR>
-nmap <silent> <A-l> :wincmd l<CR>
+nmap <silent> <Leader>k :wincmd k<CR>
+nmap <silent> <Leader>j :wincmd j<CR>
+nmap <silent> <Leader>h :wincmd h<CR>
+nmap <silent> <Leader>l :wincmd l<CR>
 
 " arrow keys resize windows
 nnoremap <silent> <Leader><Left> :vertical resize -10<CR>

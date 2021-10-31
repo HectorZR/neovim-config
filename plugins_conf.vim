@@ -11,10 +11,6 @@ if g:colors_name is 'material'
   let g:material_terminal_italics = 1
 endif
 
-if (has('termguicolors'))
-  set termguicolors
-endif
-
 " NERDTree options
 let NERDTreeQuitOnOpen=1
 let g:NERDTreeChDirMode=2

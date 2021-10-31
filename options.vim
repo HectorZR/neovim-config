@@ -11,6 +11,7 @@ set noswapfile
 set updatetime=500
 set showtabline=2
 set autoread
+set termguicolors
 
 set ignorecase
 set smartcase
@@ -37,7 +38,6 @@ set mouse=na
 set cursorline " remark current line
 
 set hidden " change buffers without save
-" set undofile
 
 set fileencoding=utf-8
 set encoding=utf8

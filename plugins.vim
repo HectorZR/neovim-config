@@ -37,6 +37,7 @@ Plug 'wakatime/vim-wakatime'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'Yggdroot/indentLine'
 Plug 'sheerun/vim-polyglot'
+Plug 'github/copilot.vim'
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -60,7 +61,7 @@ Plug 'thosakwe/vim-flutter'
 Plug 'udalov/kotlin-vim'
 
 " Python Syntax Highlighting
-Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins', 'for': 'python'}
 
 " Golang Syntax Highlighting
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
