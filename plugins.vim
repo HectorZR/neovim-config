@@ -21,8 +21,10 @@ call plug#begin(g:PLUGIN_HOME)
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'airblade/vim-gitgutter'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'tpope/vim-commentary'
 Plug 'itchyny/lightline.vim'
 Plug 'akinsho/bufferline.nvim'
@@ -38,6 +40,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'Yggdroot/indentLine'
 Plug 'sheerun/vim-polyglot'
 Plug 'github/copilot.vim'
+Plug 'yardnsm/vim-import-cost', { 'do': 'npm install --production' }
 
 " Server Language
 Plug 'neoclide/coc.nvim', {'branch': 'release'}

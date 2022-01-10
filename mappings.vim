@@ -63,7 +63,7 @@ imap <C-l> <C-Right>
 imap <C-h> <C-Left>
 
 " Select all file
-nmap <C-a> ggvG<S-l>
+nmap <C-a> ^ggvG<S-l>
 
 " Integrated Terminal
 function! OpenTerminal()
@@ -73,8 +73,8 @@ endfunction
 nnoremap <c-t> :call OpenTerminal()<CR>
 
 " move lines
-nnoremap m<Down> :m .+1<CR>==    
-nnoremap m<Up> :m .-2<CR>==      
-vnoremap m<Down> :m '>+1<CR>gv=gv    
-vnoremap m<Up> :m '<-2<CR>gv=gv
+nnoremap <A-Down> :m .+1<CR>==    
+vnoremap <A-Up> :m '<-2<CR>gv=gv
+vnoremap <A-Down> :m '>+1<CR>gv=gv    
+nnoremap <A-Up> :m .-2<CR>==      
 

@@ -3,7 +3,7 @@
 " ---------------
 
 " THEME SELECTION 
-silent! colorscheme gruvbox
+silent! colorscheme onedark
 
 " Material theme options
 if g:colors_name is 'material'
@@ -150,14 +150,20 @@ map <silent> <leader>m :NERDTreeToggle<CR>
 map <silent> <leader>c :NERDTreeFind<CR>
 
 " fzf mappings
-nnoremap <silent> <C-p> :FZF -m<CR>
-nnoremap <silent> <C-G> :Ag <CR>
+" nnoremap <silent> <C-p> :FZF -m<CR>
+" nnoremap <silent> <C-G> :Ag <CR>
+
+" telescope
+nnoremap <silent> <leader>ff :lua require('telescope.builtin').find_files()<CR>
+nnoremap <silent> <leader>fg :lua require('telescope.builtin').live_grep()<CR>
+nnoremap <silent> <leader>fb :lua require('telescope.builtin').buffers()<CR>
+nnoremap <silent> <leader>fh :lua require('telescope.builtin').help_tags()<CR>
 
 " easymotion mappings
 
 " bufferline mappings
-nnoremap <silent> fj :BufferLinePick<CR>
-nnoremap <silent> fk :BufferLinePickClose<CR>
+nnoremap <silent> <leader>fj :BufferLinePick<CR>
+nnoremap <silent> <leader>fk :BufferLinePickClose<CR>
 
 " coc mappings
 if has('nvim')
@@ -209,6 +215,7 @@ nmap <silent> <F8> :TagbarToggle<CR>
 
 " GitGutter mappings
 nmap <silent> gp :GitGutterPreviewHunk<CR>
+nmap <silent> gP :GitGutterNextHunk<CR>
 
 " JSDoc mappings
 nmap <silent> <C-l> <Plug>(jsdoc)

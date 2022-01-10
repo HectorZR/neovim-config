@@ -1,21 +1,21 @@
 {
-	"coc.preferences.formatOnSaveFiletypes": [
-		"css",
-		"javascript",
-		"javascriptreact",
-		"typescriptreact",
-		"typescript",
-		"json",
-		"markdown",
-		"python",
-		"php",
-		"dart",
-		"go"
-	],
-	"python.formatting.provider": "autopep8",
-	"prettier.singleQuote": true,
-	"python.pythonPath": "/usr/bin/python3.8",
-	"eslint.autoFixOnSave": true,
-	"typescript.autoClosingTags": true,
-	"javascript.autoClosingTags": true
+  "coc.preferences.formatOnSaveFiletypes": [
+    "css",
+    "javascript",
+    "javascriptreact",
+    "typescriptreact",
+    "typescript",
+    "json",
+    "markdown",
+    "python",
+    "php",
+    "dart",
+    "go"
+  ],
+  "python.formatting.provider": "autopep8",
+  "prettier.singleQuote": true,
+  "python.pythonPath": "/usr/bin/python3.8",
+  "eslint.autoFixOnSave": true,
+  "typescript.autoClosingTags": true,
+  "javascript.autoClosingTags": true
 }
