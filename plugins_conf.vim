@@ -2,9 +2,6 @@
 " PLUGINS OPTIONS
 " ---------------
 
-" THEME SELECTION 
-silent! colorscheme onedark
-
 " Material theme options
 if g:colors_name is 'material'
   let g:material_theme_style = 'darker-community'
@@ -98,18 +95,20 @@ require("bufferline").setup {
 EOF
 
 function! LightlineGitbranch() abort
-    if exists('*fugitive#head')
-        let branch = fugitive#head()
+    if exists('FugitiveHead')
+        let branch = FugitiveHead()
         return branch !=# '' ? branch[0:35] . ' ' : ''
    endif
-    return fugitive#head()
+    return FugitiveHead()
 endfunction
 
 function! LightlineLineinfo()
   return col('.') . ':' . line('.') . '/' . line('$')
 endfunction
 
-" coc plugins autoinstall
+" coc plugins configs
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
 " List of coc plugins I use
 let g:coc_global_extensions = [
   \ 'coc-pairs',
@@ -126,7 +125,11 @@ let g:coc_global_extensions = [
 	\ 'coc-emmet',
 	\ 'coc-prettier',
   \ 'coc-kotlin',
-  \ 'coc-eslint'
+  \ 'coc-eslint',
+  \ 'coc-react-refactor',
+  \ 'coc-docker',
+  \ 'coc-yaml',
+  \ 'coc-sh'
 \]
 
 " coc-python options
@@ -138,7 +141,6 @@ let g:javascript_plugin_jsdoc = 1
 " indentLine options
 let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 autocmd FileType json IndentLinesDisable
-
 
 
 " ----------------
@@ -166,6 +168,10 @@ nnoremap <silent> <leader>fj :BufferLinePick<CR>
 nnoremap <silent> <leader>fk :BufferLinePickClose<CR>
 
 " coc mappings
+
+" make enter key to work properly
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
 if has('nvim')
   inoremap <silent><expr> <c-space> coc#refresh()
 else
@@ -177,6 +183,8 @@ nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <F2> <Plug>(coc-rename)
+vmap <leader>a  :CocCommand react-refactor.extractToFunction<CR>
+vmap <leader>A  :CocCommand react-refactor.extractToFile<CR>
 
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
@@ -206,9 +214,6 @@ nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
 inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-				\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " tagbar mappings
 nmap <silent> <F8> :TagbarToggle<CR>

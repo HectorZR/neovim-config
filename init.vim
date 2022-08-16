@@ -5,7 +5,8 @@ let g:is_mac = has('macunix')
 let g:config_file_list = ['options.vim',
 	\ 'mappings.vim',
 	\ 'plugins.vim',
-	\ 'plugins_conf.vim'
+	\ 'custom.vim',
+	\ 'plugins_conf.vim',
 	\ ]
 
 let g:nvim_config_root = expand('<sfile>:p:h')

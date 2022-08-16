@@ -17,5 +17,6 @@
   "python.pythonPath": "/usr/bin/python3.8",
   "eslint.autoFixOnSave": true,
   "typescript.autoClosingTags": true,
-  "javascript.autoClosingTags": true
+  "javascript.autoClosingTags": true,
+  "react-refactor.produceClass": false
 }
