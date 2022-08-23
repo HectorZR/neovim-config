@@ -8,7 +8,7 @@ set relativenumber
 set ruler
 set noshowmode
 set noswapfile
-set updatetime=500
+set updatetime=300
 set showtabline=2
 set autoread
 set termguicolors

@@ -33,7 +33,7 @@ let g:lightline = {
   \ 'colorscheme': 'material',
   \ 'active': {
   \   'left': [ ['mode', 'paste'], ['readonly', 'filename', 'gitbranch'] ],
-  \   'right': [ ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'] ]
+  \   'right': [ ['lineinfo'], ['percent'], ['cocstatus', 'currentfunction', 'fileencoding', 'filetype'] ]
   \ },
   \ 'separator': {
   \   'right': '',
@@ -46,6 +46,8 @@ let g:lightline = {
   \ 'component_function': {
   \   'gitbranch': 'LightlineGitbranch',
   \   'lineinfo': 'LightlineLineinfo',
+  \   'cocstatus': 'coc#status',
+  \   'currentfunction': 'CocCurrentFunction',
   \ },
   \ 'component_raw': {
   \   'buffers': 1
@@ -100,6 +102,10 @@ function! LightlineGitbranch() abort
         return branch !=# '' ? branch[0:35] . ' ' : ''
    endif
     return FugitiveHead()
+endfunction
+
+function! CocCurrentFunction()
+    return get(b:, 'coc_current_function', '')
 endfunction
 
 function! LightlineLineinfo()
@@ -169,9 +175,17 @@ nnoremap <silent> <leader>fk :BufferLinePickClose<CR>
 
 " coc mappings
 
-" make enter key to work properly
-inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+set signcolumn=yes
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
 if has('nvim')
   inoremap <silent><expr> <c-space> coc#refresh()
 else
@@ -197,13 +211,15 @@ function! s:show_documentation()
   endif
 endfunction
 
+" make enter key to work properly
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-function! s:check_back_space() abort
+function! CheckBackspace() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction

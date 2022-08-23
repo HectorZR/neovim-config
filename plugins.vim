@@ -69,12 +69,13 @@ Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins', 'for': 'python'}
 " Golang Syntax Highlighting
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
-" File Icons
-Plug 'ryanoasis/vim-devicons'
-Plug 'kyazdani42/nvim-web-devicons'
 
 " THEMES
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'kaicataldo/material.vim'
+
+" File Icons
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'ryanoasis/vim-devicons'
 
 call plug#end()
