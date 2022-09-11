@@ -5,7 +5,7 @@ local opt = vim.opt
 -- Remap leader and local leader to <Space>
 api.nvim_set_keymap("", "<Space>", "<Nop>", { noremap = true, silent = true })
 g.mapleader = " "
--- g.maplocalleader = " "
+g.maplocalleader = " "
 
 opt.termguicolors = true -- Enable colors in terminal
 opt.hlsearch = true --Set highlight on search
@@ -16,7 +16,8 @@ opt.breakindent = true --Enable break indent
 opt.undofile = true --Save undo history
 opt.ignorecase = true --Case insensitive searching unless /C or capital in search
 opt.smartcase = true -- Smart case
-opt.updatetime = 250 --Decrease update time
+opt.updatetime = 500 --Decrease update time
+opt.timeoutlen = 500 --Time to wait for a mapped sequence to complete (in milliseconds)
 opt.signcolumn = "yes" -- Always show sign column
 opt.clipboard = "unnamedplus" -- Access system clipboard
 opt.showtabline = 2 -- Always show tabs
