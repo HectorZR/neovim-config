@@ -24,6 +24,7 @@ opt.showtabline = 2 -- Always show tabs
 opt.title = true -- Set title of window to the value of the titlestring
 opt.titlestring = '%F' -- Set title of window to the current file name
 
+vim.bo.expandtab = true -- Use spaces instead of tabs
 vim.bo.shiftwidth = 2
 vim.bo.tabstop = 2
 vim.bo.softtabstop = 2
