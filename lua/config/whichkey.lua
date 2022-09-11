@@ -23,6 +23,12 @@ function M.setup()
     ["w"] = { "<cmd>update!<CR>", "Save" },
     ["q"] = { "<cmd>q!<CR>", "Quit" },
 
+    f = {
+      name = "Telescope",
+      f = { "<cmd>Telescope find_files<cr>", "Find files" },
+      g = { "<cmd>Telescope live_grep<cr>", "Find all text" }
+    },
+
     b = {
       name = "Buffer",
       c = { "<Cmd>bd!<Cr>", "Close current buffer" },
