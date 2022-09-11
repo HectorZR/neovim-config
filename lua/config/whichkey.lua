@@ -24,9 +24,10 @@ function M.setup()
     ["q"] = { "<cmd>q!<CR>", "Quit" },
 
     f = {
-      name = "Telescope",
+      name = "Find",
       f = { "<cmd>Telescope find_files<cr>", "Find files" },
-      g = { "<cmd>Telescope live_grep<cr>", "Find all text" }
+      g = { "<cmd>Telescope live_grep<cr>", "Find all text" },
+      m = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
     },
 
     b = {
