@@ -34,6 +34,7 @@ function M.setup()
       name = "Buffer",
       c = { "<Cmd>bd!<Cr>", "Close current buffer" },
       D = { "<Cmd>%bd|e#|bd#<Cr>", "Delete all buffers" },
+      l = { "<cmd>Telescope buffers<cr>", "List buffers"}
     },
 
     z = {

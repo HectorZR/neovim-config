@@ -164,6 +164,15 @@ function M.setup()
       requires = { {'nvim-lua/plenary.nvim'} }
     }
 
+    -- Buffer line
+    use {
+      "akinsho/nvim-bufferline.lua",
+      event = "BufReadPre",
+      wants = "nvim-web-devicons",
+      config = function()
+        require("config.bufferline").setup()
+      end,
+    }
     -- Nvim-tree (file explorer)
     use {
       "kyazdani42/nvim-tree.lua",
@@ -191,6 +200,20 @@ function M.setup()
         { "ms-jpq/coq.thirdparty", branch = "3p", module = "coq_3p" },
       },
       disable = false,
+    }
+
+    -- LSP
+    use {
+      "neovim/nvim-lspconfig",
+      opt = true,
+      event = "BufReadPre",
+      wants = { "nvim-lsp-installer" },
+      config = function()
+        require("config.lsp").setup()
+      end,
+      requires = {
+        "williamboman/nvim-lsp-installer",
+      },
     }
 
     if packer_bootstrap then
