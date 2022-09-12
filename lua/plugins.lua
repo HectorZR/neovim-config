@@ -45,9 +45,15 @@ function M.setup()
     -- Colorscheme
     use {
       "sainnhe/everforest",
+      -- config = function()
+      --   vim.cmd "colorscheme everforest"
+      -- end,
+    }
+    use {
+      "folke/tokyonight.nvim",
       config = function()
-        vim.cmd "colorscheme everforest"
-      end,
+	vim.cmd "colorscheme tokyonight-storm"
+      end
     }
 
     -- Startup screen
