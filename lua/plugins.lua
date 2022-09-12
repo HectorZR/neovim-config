@@ -222,6 +222,9 @@ function M.setup()
       },
     }
 
+    -- EasyMotion
+    use "easymotion/vim-easymotion"
+
     if packer_bootstrap then
       print "Restart Neovim required after installation!"
       require("packer").sync()
