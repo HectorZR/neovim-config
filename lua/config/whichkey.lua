@@ -21,7 +21,8 @@ function M.setup()
 
   local mappings = {
     ["w"] = { "<cmd>update!<CR>", "Save" },
-    ["q"] = { "<cmd>q!<CR>", "Quit" },
+    ["Q"] = { "<cmd>q!<CR>", "Quit" },
+    ["q"] = { "<Cmd>bd!<Cr>", "Close current buffer"},
 
     f = {
       name = "Find",
@@ -32,7 +33,6 @@ function M.setup()
 
     b = {
       name = "Buffer",
-      c = { "<Cmd>bd!<Cr>", "Close current buffer" },
       D = { "<Cmd>%bd|e#|bd#<Cr>", "Delete all buffers" },
       l = { "<cmd>Telescope buffers<cr>", "List buffers"}
     },
