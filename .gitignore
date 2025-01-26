@@ -1,3 +1,4 @@
 ﻿.netrwhist
 custom.vim
 plugin/packer_compiled.lua
+.DS_Store
