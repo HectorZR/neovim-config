@@ -1,17 +1,12 @@
 return {
     'akinsho/bufferline.nvim',
     version = "*",
-    dependencies = 'nvim-tree/nvim-web-devicons',
     opts = {
         options = {
             mode = "buffers", -- set to "tabs" to only show tabpages instead
             -- style_preset = bufferline.style_preset.default, -- or bufferline.style_preset.minimal,
             -- themable = true | false, -- allows highlight groups to be overriden i.e. sets highlights as default
-            numbers = "ordinal",
-            -- close_command = "bdelete! %d",       -- can be a string | function, | false see "Mouse actions"
-            -- right_mouse_command = "bdelete! %d", -- can be a string | function | false, see "Mouse actions"
-            -- left_mouse_command = "buffer %d",    -- can be a string | function, | false see "Mouse actions"
-            -- middle_mouse_command = nil,          -- can be a string | function, | false see "Mouse actions"
+            numbers = "none",
             indicator = {
                 -- icon = '▎', -- this should be omitted if indicator style is not 'icon'
                 style = 'underline',
@@ -32,17 +27,18 @@ return {
             --       -- buffers (tabs only) | table(int) | the numbers of the buffers in the tab
             --       -- tabnr (tabs only)   | int        | the "handle" of the tab, can be converted to its ordinal number using: `vim.api.nvim_tabpage_get_number(buf.tabnr)`
             -- end,
-            max_name_length = 18,
-            max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
+            max_name_length = 16,
+            max_prefix_length = 13, -- prefix used when a buffer is de-duplicated
             truncate_names = true,  -- whether or not tab names should be truncated
-            tab_size = 18,
-            -- diagnostics = false | "nvim_lsp" | "coc",
+            tab_size = 16,
+            diagnostics = "nvim_lsp",
             diagnostics_update_in_insert = false, -- only applies to coc
             diagnostics_update_on_event = true,   -- use nvim's diagnostic handler
             -- The diagnostics indicator can be set to nil to keep the buffer name highlight but delete the highlighting
-            -- diagnostics_indicator = function(count, level, diagnostics_dict, context)
-            --     return "("..count..")"
-            -- end,
+            diagnostics_indicator = function(count, level, diagnostics_dict, context)
+                local icon = level:match("error") and " " or " "
+                return " " .. count .. icon
+            end,
             -- NOTE: this will be called a lot so don't do any heavy processing here
             -- custom_filter = function(buf_number, buf_numbers)
             --     -- filter out filetypes you don't want to see
@@ -63,14 +59,14 @@ return {
             --         return true
             --     end
             -- end,
-            offsets = {
-                {
-                    filetype = "NvimTree",
-                    -- text = "File Explorer" | function ,
-                    -- text_align = "left" | "center" | "right"
-                    separator = true
-                }
-            },
+            -- offsets = {
+            --     {
+            --         filetype = "NvimTree",
+            -- text = "File Explorer" | function ,
+            -- text_align = "left" | "center" | "right"
+            --         separator = true
+            --     }
+            -- },
             -- color_icons = true | false, -- whether or not to add the filetype icon highlights
             -- get_element_icon = function(element)
             --   -- element consists of {filetype: string, path: string, extension: string, directory: string}
@@ -93,7 +89,7 @@ return {
             -- move_wraps_at_ends = false, -- whether or not the move command "wraps" at the first or last position
             -- -- can also be a table containing 2 custom separators
             -- -- [focused and unfocused]. eg: { '|', '|' }
-            separator_style = "slant",
+            separator_style = "thin",
             -- enforce_regular_tabs = false | true,
             -- always_show_bufferline = true | false,
             -- auto_toggle_bufferline = true | false,

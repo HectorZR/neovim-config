@@ -2,17 +2,36 @@ return {
     "folke/which-key.nvim",
     event = "VeryLazy",
     opts = {
-        -- your configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
+        preset = 'helix',
     },
     keys = {
         {
-            "<leader>?",
+            "<leader>l",
             function()
-                require("which-key").show({ global = false })
+                vim.cmd [[Lazy]]
             end,
-            desc = "Buffer Local Keymaps (which-key)",
+            desc = "Load lazy.nvim"
         },
+        {
+            "<leader>q",
+            function()
+                vim.cmd [[bdelete]]
+            end,
+            desc = "Close buffer"
+        },
+        {
+            "<leader>w",
+            function()
+                vim.cmd [[w]]
+            end,
+            desc = "Save buffer"
+        },
+        {
+            "<leader>Q",
+            function()
+                vim.cmd [[qa]]
+            end,
+            desc = "Close Neovim"
+        }
     },
 }
