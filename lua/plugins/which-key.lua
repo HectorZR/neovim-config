@@ -20,11 +20,18 @@ return {
             desc = "Close buffer"
         },
         {
-            "<leader>w",
+            "<leader>s",
             function()
                 vim.cmd [[w]]
             end,
             desc = "Save buffer"
+        },
+        {
+            "<leader>as",
+            function()
+                vim.cmd [[wa]]
+            end,
+            desc = "Save all buffers"
         },
         {
             "<leader>Q",
@@ -32,6 +39,27 @@ return {
                 vim.cmd [[qa]]
             end,
             desc = "Close Neovim"
+        },
+        {
+            "<leader>nn",
+            function()
+                vim.cmd [[noh]]
+            end,
+            desc = "Clear highlights"
+        },
+        {
+            "<S-h>",
+            function()
+                vim.cmd [[bprevious]]
+            end,
+            desc = "Switch to previous buffer"
+        },
+        {
+            "<S-l>",
+            function()
+                vim.cmd [[bnext]]
+            end,
+            desc = "Switch to next buffer"
         }
     },
 }
