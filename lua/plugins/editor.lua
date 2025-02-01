@@ -10,4 +10,10 @@ return {
       },
     },
   },
+  {
+    "echasnovski/mini.move",
+    event = "VeryLazy",
+    opts = {},
+  },
+  { "mg979/vim-visual-multi" },
 }
