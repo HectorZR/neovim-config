@@ -13,10 +13,5 @@ return {
         padding = { left = 0, right = 1 },
       },
     }
-
-    opts.tabline = {}
-    opts.tabline.lualine_b = {
-      { "buffers", mode = 2, use_mode_colors = true },
-    }
   end,
 }
