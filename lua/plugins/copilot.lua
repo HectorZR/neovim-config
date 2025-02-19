@@ -19,8 +19,11 @@ local prompts = {
 }
 
 return {
-  "CopilotC-Nvim/CopilotChat.nvim",
-  opts = {
-    prompts = prompts,
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    opts = {
+      prompts = prompts,
+    },
   },
+  { "github/copilot.vim" },
 }
