@@ -1,5 +1,8 @@
 return {
   "ibhagwan/fzf-lua",
+  cond = function()
+    return vim.fn.executable("fzf") == 1
+  end,
   opts = {
     files = {
       fd_opts = table.concat({
