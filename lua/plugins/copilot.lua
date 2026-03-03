@@ -1,3 +1,19 @@
+local function copilot_available()
+  if vim.fn.executable("node") ~= 1 then
+    return false
+  end
+  local auth_paths = {
+    "~/.config/github-copilot/hosts.json",
+    "~/AppData/Local/github-copilot/hosts.json",
+  }
+  for _, path in ipairs(auth_paths) do
+    if vim.fn.filereadable(vim.fn.expand(path)) == 1 then
+      return true
+    end
+  end
+  return false
+end
+
 local prompts = {
   Explain = "Please explain how the following code works.",
   Review = "Please review the following code and provide suggestions for improvement.",
@@ -20,10 +36,14 @@ local prompts = {
 
 return {
   {
+    "zbirenbaum/copilot.lua",
+    cond = copilot_available,
+  },
+  {
     "CopilotC-Nvim/CopilotChat.nvim",
+    cond = copilot_available,
     opts = {
       prompts = prompts,
     },
   },
-  { "github/copilot.vim" },
 }
