@@ -1,6 +1,9 @@
 return {
   "kdheepak/lazygit.nvim",
   lazy = true,
+  cond = function()
+    return vim.fn.executable("lazygit") == 1
+  end,
   cmd = {
     "LazyGit",
     "LazyGitConfig",
