@@ -23,5 +23,18 @@ return {
         "--exclude=vendor",
       }, " "),
     },
+    previewers = {
+      builtin = {
+        extensions = {
+          ["png"] = { "chafa", "--format=symbols", "<file>" },
+          ["jpg"] = { "chafa", "--format=symbols", "<file>" },
+          ["jpeg"] = { "chafa", "--format=symbols", "<file>" },
+          ["gif"] = { "chafa", "--format=symbols", "<file>" },
+          ["webp"] = { "chafa", "--format=symbols", "<file>" },
+          ["svg"] = { "chafa", "--format=symbols", "<file>" },
+          ["ico"] = { "chafa", "--format=symbols", "<file>" },
+        },
+      },
+    },
   },
 }

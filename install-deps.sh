@@ -31,7 +31,14 @@ else
   exit 1
 fi
 
+# Detect WSL (runs on top of Linux)
+IS_WSL=false
+if [[ "$OS" == "linux" ]] && grep -qi microsoft /proc/version 2>/dev/null; then
+  IS_WSL=true
+fi
+
 info "Detected OS: $OS"
+$IS_WSL && info "WSL environment detected"
 echo ""
 
 # ── macOS: ensure Homebrew ────────────────────────────────────────────────────
@@ -231,7 +238,64 @@ elif [[ "$OS" == "linux" ]]; then
   install_apt npm
 fi
 
-# ── 8. claude CLI ─────────────────────────────────────────────────────────────
+# ── 8. imagemagick ────────────────────────────────────────────────────────────
+
+echo ""
+info "==> imagemagick (image processing for image.nvim)"
+
+if [[ "$OS" == "macos" ]]; then
+  install_brew imagemagick
+elif [[ "$OS" == "linux" ]]; then
+  install_apt imagemagick
+fi
+
+# ── 9. chafa ──────────────────────────────────────────────────────────────────
+
+echo ""
+info "==> chafa (image preview in fzf-lua — works in any terminal)"
+
+if has chafa; then
+  ok "chafa already installed"
+elif [[ "$OS" == "macos" ]]; then
+  install_brew chafa
+elif [[ "$OS" == "linux" ]]; then
+  install_apt chafa
+fi
+
+# ── 10. win32yank (WSL clipboard bridge) ──────────────────────────────────────
+
+if $IS_WSL; then
+  echo ""
+  info "==> win32yank (WSL ↔ Windows clipboard bridge)"
+
+  if has win32yank.exe; then
+    ok "win32yank.exe already installed"
+  else
+    info "Downloading win32yank.exe..."
+    ARCH="$(uname -m)"
+    case "$ARCH" in
+      x86_64)  WIN32YANK_ZIP="win32yank-x64.zip" ;;
+      aarch64) WIN32YANK_ZIP="win32yank-arm64.zip" ;;
+      *)        warn "Unsupported architecture: $ARCH — skipping win32yank"; WIN32YANK_ZIP="" ;;
+    esac
+
+    if [[ -n "$WIN32YANK_ZIP" ]]; then
+      WIN32YANK_VERSION="$(curl -s https://api.github.com/repos/equalsraf/win32yank/releases/latest \
+        | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')"
+      WIN32YANK_URL="https://github.com/equalsraf/win32yank/releases/download/${WIN32YANK_VERSION}/${WIN32YANK_ZIP}"
+
+      TMP_DIR="$(mktemp -d)"
+      curl -sLo "$TMP_DIR/win32yank.zip" "$WIN32YANK_URL"
+      unzip -p "$TMP_DIR/win32yank.zip" win32yank.exe > "$TMP_DIR/win32yank.exe"
+      chmod +x "$TMP_DIR/win32yank.exe"
+      sudo mv "$TMP_DIR/win32yank.exe" /usr/local/bin/win32yank.exe
+      rm -rf "$TMP_DIR"
+      ok "win32yank.exe installed to /usr/local/bin/win32yank.exe"
+    fi
+  fi
+fi
+
+# ── 11. claude CLI ────────────────────────────────────────────────────────────
 
 echo ""
 info "==> claude CLI (optional — for claudecode.nvim)"
@@ -271,6 +335,9 @@ check_tool lazygit
 check_tool gcc
 check_tool node
 check_tool npm
+check_tool convert  # imagemagick
+check_tool chafa
+$IS_WSL && check_tool win32yank.exe
 
 echo ""
 if [[ ${#MISSING[@]} -eq 0 ]]; then
