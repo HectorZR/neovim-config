@@ -6,7 +6,8 @@ return {
       local has_ghostty = vim.env.GHOSTTY_RESOURCES_DIR ~= nil
       local has_kitty = vim.env.KITTY_WINDOW_ID ~= nil
       local has_ueberzug = vim.fn.executable("ueberzugpp") == 1
-      return has_ghostty or has_kitty or has_ueberzug
+      local has_magick = vim.fn.executable("magick") == 1 or vim.fn.executable("convert") == 1
+      return (has_ghostty or has_kitty or has_ueberzug) and has_magick
     end,
     opts = {
       backend = (function()
