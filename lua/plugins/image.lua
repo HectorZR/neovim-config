@@ -1,7 +1,22 @@
+local function is_wsl()
+  local f = io.open("/proc/version", "r")
+  if f then
+    local content = f:read("*a")
+    f:close()
+    return content:lower():find("microsoft") ~= nil
+  end
+  return false
+end
+
 return {
   {
     "3rd/image.nvim",
     build = false,
+    init = function()
+      if is_wsl() then
+        vim.env.UEBERZUGPP_LAYER = "chafa"
+      end
+    end,
     cond = function()
       local has_ghostty = vim.env.GHOSTTY_RESOURCES_DIR ~= nil
       local has_kitty = vim.env.KITTY_WINDOW_ID ~= nil

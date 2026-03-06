@@ -262,7 +262,50 @@ elif [[ "$OS" == "linux" ]]; then
   install_apt chafa
 fi
 
-# ── 10. win32yank (WSL clipboard bridge) ──────────────────────────────────────
+# ── 10. ueberzugpp (WSL/Linux image backend for image.nvim) ──────────────────
+
+if [[ "$OS" == "linux" ]]; then
+  echo ""
+  info "==> ueberzugpp (image backend for image.nvim)"
+
+  if has ueberzugpp; then
+    ok "ueberzugpp already installed"
+  else
+    info "Fetching latest ueberzugpp release from GitHub..."
+    UEBERZUG_VERSION="$(curl -s https://api.github.com/repos/jstkdng/ueberzugpp/releases/latest \
+      | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')"
+
+    if [[ -z "$UEBERZUG_VERSION" ]]; then
+      warn "Could not determine latest ueberzugpp version."
+      warn "Install manually from: https://github.com/jstkdng/ueberzugpp/releases"
+    else
+      ARCH="$(uname -m)"
+      case "$ARCH" in
+        x86_64)  ARCH_TAG="x86_64" ;;
+        aarch64) ARCH_TAG="aarch64" ;;
+        *)        warn "Unsupported architecture: $ARCH"; ARCH_TAG="" ;;
+      esac
+
+      if [[ -n "$ARCH_TAG" ]]; then
+        TARBALL="ueberzugpp-${UEBERZUG_VERSION}-linux-${ARCH_TAG}.tar.gz"
+        URL="https://github.com/jstkdng/ueberzugpp/releases/download/v${UEBERZUG_VERSION}/${TARBALL}"
+
+        TMP_DIR="$(mktemp -d)"
+        if curl -sLo "$TMP_DIR/$TARBALL" "$URL" 2>/dev/null; then
+          tar -xf "$TMP_DIR/$TARBALL" -C "$TMP_DIR"
+          sudo install "$TMP_DIR/ueberzugpp" /usr/local/bin/ueberzugpp
+          rm -rf "$TMP_DIR"
+          ok "ueberzugpp ${UEBERZUG_VERSION} installed to /usr/local/bin/ueberzugpp"
+        else
+          warn "Download failed. Install manually from: https://github.com/jstkdng/ueberzugpp/releases"
+          rm -rf "$TMP_DIR"
+        fi
+      fi
+    fi
+  fi
+fi
+
+# ── 11. win32yank (WSL clipboard bridge) ──────────────────────────────────────
 
 if $IS_WSL; then
   echo ""
@@ -295,7 +338,7 @@ if $IS_WSL; then
   fi
 fi
 
-# ── 11. claude CLI ────────────────────────────────────────────────────────────
+# ── 12. claude CLI ────────────────────────────────────────────────────────────
 
 echo ""
 info "==> claude CLI (optional — for claudecode.nvim)"
@@ -337,6 +380,7 @@ check_tool node
 check_tool npm
 check_tool convert  # imagemagick
 check_tool chafa
+[[ "$OS" == "linux" ]] && check_tool ueberzugpp
 $IS_WSL && check_tool win32yank.exe
 
 echo ""
