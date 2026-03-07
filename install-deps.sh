@@ -271,36 +271,19 @@ if [[ "$OS" == "linux" ]]; then
   if has ueberzugpp; then
     ok "ueberzugpp already installed"
   else
-    info "Fetching latest ueberzugpp release from GitHub..."
-    UEBERZUG_VERSION="$(curl -s https://api.github.com/repos/jstkdng/ueberzugpp/releases/latest \
-      | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')"
-
-    if [[ -z "$UEBERZUG_VERSION" ]]; then
-      warn "Could not determine latest ueberzugpp version."
-      warn "Install manually from: https://github.com/jstkdng/ueberzugpp/releases"
+    # Strategy 1: apt (available on some distros / with PPAs)
+    if apt-cache show ueberzugpp &>/dev/null 2>&1; then
+      info "Installing ueberzugpp via apt..."
+      sudo apt-get install -y ueberzugpp && ok "ueberzugpp installed via apt"
+    # Strategy 2: nix-env (if nix package manager is available)
+    elif has nix-env; then
+      info "Installing ueberzugpp via nix-env..."
+      nix-env -iA nixpkgs.ueberzugpp && ok "ueberzugpp installed via nix"
     else
-      ARCH="$(uname -m)"
-      case "$ARCH" in
-        x86_64)  ARCH_TAG="x86_64" ;;
-        aarch64) ARCH_TAG="aarch64" ;;
-        *)        warn "Unsupported architecture: $ARCH"; ARCH_TAG="" ;;
-      esac
-
-      if [[ -n "$ARCH_TAG" ]]; then
-        TARBALL="ueberzugpp-${UEBERZUG_VERSION}-linux-${ARCH_TAG}.tar.gz"
-        URL="https://github.com/jstkdng/ueberzugpp/releases/download/v${UEBERZUG_VERSION}/${TARBALL}"
-
-        TMP_DIR="$(mktemp -d)"
-        if curl -sLo "$TMP_DIR/$TARBALL" "$URL" 2>/dev/null; then
-          tar -xf "$TMP_DIR/$TARBALL" -C "$TMP_DIR"
-          sudo install "$TMP_DIR/ueberzugpp" /usr/local/bin/ueberzugpp
-          rm -rf "$TMP_DIR"
-          ok "ueberzugpp ${UEBERZUG_VERSION} installed to /usr/local/bin/ueberzugpp"
-        else
-          warn "Download failed. Install manually from: https://github.com/jstkdng/ueberzugpp/releases"
-          rm -rf "$TMP_DIR"
-        fi
-      fi
+      warn "ueberzugpp not available via apt or nix on this system."
+      warn "ueberzugpp provides NO prebuilt binaries — build from source:"
+      warn "  https://github.com/jstkdng/ueberzugpp#build-from-source"
+      warn "image.nvim will be disabled in Neovim until ueberzugpp is installed."
     fi
   fi
 fi
