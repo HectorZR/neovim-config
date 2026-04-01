@@ -1,12 +1,18 @@
 {
   "extras": [
+    "lazyvim.plugins.extras.ai.avante",
+    "lazyvim.plugins.extras.ai.claudecode",
+    "lazyvim.plugins.extras.ai.copilot",
     "lazyvim.plugins.extras.ai.copilot-chat",
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.editor.mini-move",
+    "lazyvim.plugins.extras.lang.astro",
     "lazyvim.plugins.extras.lang.docker",
     "lazyvim.plugins.extras.lang.git",
     "lazyvim.plugins.extras.lang.json",
     "lazyvim.plugins.extras.lang.markdown",
+    "lazyvim.plugins.extras.lang.typescript",
+    "lazyvim.plugins.extras.ui.mini-animate",
     "lazyvim.plugins.extras.util.dot"
   ],
   "install_version": 7,
