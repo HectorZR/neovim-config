@@ -73,7 +73,7 @@ local tools = {
 
 local informational = {
   { name = "go", info = "Required by gopls LSP server" },
-  { name = "claude", info = "Claude Code CLI — required by claudecode.nvim" },
+  { name = "opencode", info = "OpenCode CLI — required by opencode.nvim" },
 }
 
 local function install_hint(tool)
