@@ -5,6 +5,10 @@ return {
     opts.picker.sources = opts.picker.sources or {}
     opts.picker.sources.explorer = vim.tbl_deep_extend("force", opts.picker.sources.explorer or {}, {
       layout = { preset = "sidebar", preview = "main", layout = { position = "right" } },
+      -- Start with preview hidden; toggle with <M-p> or P will show it in the main area
+      on_show = function(picker)
+        picker:toggle("preview", { enable = false })
+      end,
     })
     opts.picker.sources.projects = vim.tbl_deep_extend("force", opts.picker.sources.projects or {}, {
       dev = { "~/dev", "~/projects", "~/Developer" },
