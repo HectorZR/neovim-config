@@ -96,6 +96,7 @@ Run `:WhichKey <leader>` to interactively browse all leader bindings.
 | `<leader>ii` | Ask (free text) |
 | `<leader>iI` | Ask with current context |
 | `<leader>ib` | Ask about buffer |
+| `<leader>iP` | Send current context as prompt |
 | `<leader>ipe` | Explain |
 | `<leader>ipf` | Fix |
 | `<leader>ipd` | Diagnose |

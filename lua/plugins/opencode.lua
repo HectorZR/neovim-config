@@ -46,7 +46,7 @@ return {
       desc = "OpenCode ask about buffer",
     },
     {
-      "<leader>ip",
+      "<leader>iP",
       function()
         require("opencode").prompt("@this", { submit = true })
       end,
