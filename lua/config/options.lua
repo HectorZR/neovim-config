@@ -18,3 +18,6 @@ end
 -- lualine is disabled: show the mode in our own statusline
 vim.opt.showmode = false
 require("user.statusline").setup()
+
+-- one tab per git worktree, labelled with its branch (see user.worktrees)
+require("user.worktrees").setup()
