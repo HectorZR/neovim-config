@@ -157,7 +157,8 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 ### Inside the diff view (codediff.nvim)
 
 The bottom row has the changed files on the left and the commits of the branch on the right. Choosing a commit
-filters the file list and the diff to it; `All changes` at the top of the list goes back.
+filters the file list and the diff to it. `Untracked changes` shows the work not committed yet, including new files,
+and `All changes` goes back to the original comparison.
 
 | Key | Action |
 |-----|--------|
@@ -171,7 +172,7 @@ filters the file list and the diff to it; `All changes` at the top of the list g
 | `<leader>b` / `<leader>e` | Toggle (with commits) / focus file list |
 | `g?` | Show all diff keymaps |
 | `q` | Close the diff tab |
-| `<CR>` (commits) | Show the files of that commit, or everything on `All changes` |
+| `<CR>` (commits) | Show that commit, `Untracked changes` or `All changes` |
 | `R` (commits) | Refresh the commit list |
 
 ---

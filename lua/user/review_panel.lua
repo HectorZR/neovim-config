@@ -1,7 +1,8 @@
 -- Commits panel of the review tab: sits to the right of the codediff file list, in the bottom row.
 -- It follows the file list: it appears, hides and goes away with it.
--- Choosing a commit points that file list at the commit; "All changes" goes back to the original
--- comparison. This changes codediff's session data, so codediff is pinned in plugins/review.lua.
+-- Choosing a commit points that file list at the commit; "Untracked changes" shows the work not
+-- committed yet, and "All changes" goes back to the original comparison. This changes codediff's
+-- session data, so codediff is pinned in plugins/review.lua.
 local M = {}
 
 local FILETYPE = "codediff-commits"
@@ -12,6 +13,8 @@ local bases = {} -- buffer -> branch the commits are compared with
 local shown = {} -- buffer -> { base, items } last drawn
 local tab_states = {} -- tab -> { original = comparison the tab opened with, selected = commit hash }
 local EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+local UNCOMMITTED = "uncommitted" -- value of `selected` for the "Untracked changes" row
+local FIRST_COMMIT_ROW = 4
 
 local function find_windows(tab)
   local explorer, panel
@@ -55,6 +58,10 @@ local function draw(buf, base, items)
   local lines = {
     { { title, "Directory" } },
     { marker(not state.selected), { "All changes", state.selected and "Normal" or "Title" } },
+    {
+      marker(state.selected == UNCOMMITTED),
+      { "Untracked changes", state.selected == UNCOMMITTED and "Title" or "Normal" },
+    },
   }
   for _, item in ipairs(items) do
     local line = { marker(state.selected == item.full), { item.hash .. " ", "SnacksPickerDimmed" } }
@@ -122,12 +129,12 @@ local function compare(tab, comparison)
   end)
 end
 
---- Show the row under the cursor: "All changes" or one commit.
+--- Show the row under the cursor: "All changes", "Untracked changes" or one commit.
 local function select_row(buf)
   local tab = vim.api.nvim_get_current_tabpage()
   local row = vim.fn.line(".")
-  local item = row > 2 and (commits[buf] or {})[row - 2] or nil
-  if row < 2 or (row > 2 and not item) then
+  local item = (commits[buf] or {})[row - FIRST_COMMIT_ROW + 1]
+  if row < 2 or (row >= FIRST_COMMIT_ROW and not item) then
     return
   end
   local session = require("codediff.ui.lifecycle").get_session(tab)
@@ -137,14 +144,16 @@ local function select_row(buf)
   end
   local state = tab_states[tab] or {}
   tab_states[tab] = state
-  local selected = item and item.full or nil
+  local selected = item and item.full or (row == 3 and UNCOMMITTED or nil)
   if state.selected == selected then
     return
   end
   state.original = state.original
     or { base = data.base_revision, target = data.target_revision, source = data.source_revisions }
   local comparison = state.original
-  if item then
+  if selected == UNCOMMITTED then
+    comparison = {} -- no revisions: codediff compares the working tree with HEAD
+  elseif item then
     local parent = vim.system({ "git", "rev-parse", "--verify", "--quiet", item.full .. "^" }, { text = true }):wait()
     -- a first commit has no parent: compare it with git's empty tree
     comparison = { base = parent.code == 0 and vim.trim(parent.stdout) or EMPTY_TREE, target = item.full }
