@@ -208,7 +208,14 @@ function M.pick()
     })
   end
 
-  local agent_icons = { working = "⚙ ", blocked = "✋", done = "✅", idle = "· " }
+  -- Nerd Font glyphs: one cell wide, so the columns stay aligned
+  local agent_icons = {
+    working = { "󰒓", "DiagnosticInfo" },
+    blocked = { "󰀨", "DiagnosticWarn" },
+    done = { "󰗠", "DiagnosticOk" },
+    idle = { "󰝦", "Comment" },
+    unknown = { "󰋗", "Comment" },
+  }
   Snacks.picker.pick({
     title = "Worktrees",
     items = items,
@@ -218,9 +225,8 @@ function M.pick()
       local ret = {}
       table.insert(ret, { item.current and "● " or (item.open and "○ " or "  "), "Special" })
       table.insert(ret, { ("%-32s"):format(item.wt.branch), item.current and "Title" or "Normal" })
-      if item.agent then
-        table.insert(ret, { (agent_icons[item.agent] or "  ") .. " ", "DiagnosticInfo" })
-      end
+      local agent = agent_icons[item.agent] or { " ", "Normal" }
+      table.insert(ret, { agent[1] .. " ", agent[2] })
       if item.st.dirty > 0 then
         table.insert(ret, { ("~%d "):format(item.st.dirty), "DiagnosticWarn" })
       end

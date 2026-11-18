@@ -165,7 +165,9 @@ Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude
 | `<C-a>` (panel) | Switch and open/focus its Claude in herdr |
 | `gt` / `gT` | Next / prev tab |
 
-Panel markers: `●` current, `○` open in a tab, `~N` uncommitted files, `↑N`/`↓N` ahead/behind, plus the agent state.
+Panel markers: `●` current, `○` open in a tab, `~N` uncommitted files, `↑N`/`↓N` ahead/behind.
+
+Agent state: `󰒓` working, `󰀨` waiting for you, `󰗠` done, `󰝦` idle, `󰋗` unknown.
 
 ---
 
