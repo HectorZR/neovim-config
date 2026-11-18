@@ -245,6 +245,38 @@ function M.open_pr()
   end)
 end
 
+--- snacks.gh settings, extended with the merge queue state it does not know about.
+--- Yellow, like GitHub's queued label.
+local function gh_config()
+  local config = require("snacks.gh").config()
+  config.icons.pr.queued = config.icons.review.pending
+  vim.api.nvim_set_hl(0, "SnacksGhPrQueued", { link = "DiagnosticWarn", default = true })
+  return config
+end
+
+--- `gh pr` has no merge queue field, so it comes from GraphQL. cb(true) when the PR is queued.
+local function fetch_queued(pr, cwd, cb)
+  local owner, repo = pr.url:match("^https?://[^/]+/([^/]+)/([^/]+)/pull/")
+  if not owner then
+    return cb(false)
+  end
+  local query = "query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo)"
+    .. "{pullRequest(number:$number){isInMergeQueue}}}"
+  local args = { "api", "graphql", "-f", "query=" .. query, "-f", "owner=" .. owner, "-f", "repo=" .. repo }
+  vim.list_extend(args, { "-F", "number=" .. pr.number })
+  gh_json(args, cwd, function(res)
+    cb(vim.tbl_get(res or {}, "data", "repository", "pullRequest", "isInMergeQueue") == true)
+  end)
+end
+
+local function is_queued(pr)
+  return pr.details and pr.details.queued == true
+end
+
+local function pr_icon_name(pr)
+  return is_queued(pr) and "queued" or pr.isDraft and "draft" or "open"
+end
+
 --- "success" | "failure" | "pending" | "skipped" for one entry of statusCheckRollup.
 local function check_state(check)
   local result = check.state
@@ -268,7 +300,9 @@ end
 local function pr_highlight(pr)
   local details = pr.details or {}
   local checks = checks_state(pr)
-  if pr.isDraft then
+  if is_queued(pr) then
+    return "SnacksGhPrQueued"
+  elseif pr.isDraft then
     return "SnacksGhPrDraft"
   elseif checks == "failure" or pr.reviewDecision == "CHANGES_REQUESTED" or details.mergeable == "CONFLICTING" then
     return "SnacksGhCheckFailure"
@@ -295,7 +329,7 @@ local function gh_item(pr)
     }
   end, pr.details and pr.details.statusCheckRollup or {})
   local item = require("snacks.gh.item").new(raw, { type = "pr" })
-  item.status = pr.isDraft and "draft" or "open"
+  item.status = pr_icon_name(pr)
   return item
 end
 
@@ -306,7 +340,7 @@ local function prop(name, value)
 end
 
 local function pr_preview(item, lines)
-  local H, config = Snacks.picker.highlight, require("snacks.gh").config()
+  local H, config = Snacks.picker.highlight, gh_config()
   local pr = item.pr
   if not pr then
     local empty = { loading = "Loading…", none = "No open PR", unavailable = "Not available (is gh logged in?)" }
@@ -338,7 +372,7 @@ local function pr_preview(item, lines)
 end
 
 local function status_preview(item, lines)
-  local H, config = Snacks.picker.highlight, require("snacks.gh").config()
+  local H, config = Snacks.picker.highlight, gh_config()
   if not item.status then
     table.insert(lines, prop("Git", { { "Loading…", "SnacksPickerDimmed" } }))
     return
@@ -384,7 +418,7 @@ local function render_preview(ctx)
   ctx.preview:reset()
   ctx.preview:minimal()
   ctx.preview:wo({ wrap = true, linebreak = true })
-  local logo = require("snacks.gh").config().icons.logo
+  local logo = gh_config().icons.logo
   ctx.preview:set_title(item.pr and ("%sPR #%d"):format(logo, item.pr.number) or vim.fs.basename(item.wt.path))
   Snacks.picker.highlight.render(ctx.buf, preview_ns, lines)
 end
@@ -459,8 +493,13 @@ local function load_details(picker, items, main)
       if pr then
         gh_json({ "pr", "view", tostring(pr.number), "--json", details }, main, function(extra)
           if extra then
+            extra.queued = is_queued(pr)
             pr.details = extra
             redraw()
+            fetch_queued(pr, main, function(queued)
+              extra.queued = queued
+              redraw()
+            end)
           end
         end)
       end
@@ -536,15 +575,15 @@ function M.pick()
     preview = render_preview,
     layout = { preset = "default" },
     format = function(item)
-      local H, config = Snacks.picker.highlight, require("snacks.gh").config()
+      local H, config = Snacks.picker.highlight, gh_config()
       local agent = agent_icons[item.agent] or { " " }
       local st, pr = item.st, item.pr
       local checks = pr and checks_state(pr)
       local check_hl = checks and "SnacksGhCheck" .. Snacks.picker.util.title(checks) or nil
-      local pr_icon = pr and vim.trim(config.icons.pr[pr.isDraft and "draft" or "open"]) or ""
+      local pr_icon = pr and vim.trim(config.icons.pr[pr_icon_name(pr)]) or ""
       local ret = {
         { item.current and "● " or (item.open and "○ " or "  "), "Special" },
-        cell(pr_icon, 2, pr and (pr.isDraft and "SnacksGhPrDraft" or "SnacksGhPrOpen") or nil),
+        cell(pr_icon, 2, pr and "SnacksGhPr" .. Snacks.picker.util.title(pr_icon_name(pr)) or nil),
         cell(
           item.label,
           branch_width + 1,
@@ -646,6 +685,8 @@ local function pr_summary(pr)
     return "merged", "Merged", "Keyword"
   elseif pr.state == "CLOSED" then
     return "closed", "Closed", "SnacksGhPrClosed"
+  elseif is_queued(pr) then
+    return "queued", "Queued", "SnacksGhPrQueued"
   elseif pr.isDraft then
     return "draft", "Draft", "Comment"
   end
@@ -667,7 +708,7 @@ local function redraw_statusline()
 end
 
 local function fetch_branch_pr(cwd, entry)
-  local fields = "number,state,isDraft,isCrossRepository,headRefName,headRefOid,reviewDecision,"
+  local fields = "number,url,state,isDraft,isCrossRepository,headRefName,headRefOid,reviewDecision,"
     .. "mergeable,statusCheckRollup"
   local detached = entry.ref == "HEAD"
   local wt = { branch = entry.ref, head = entry.sha:sub(1, 7), detached = detached }
@@ -684,10 +725,17 @@ local function fetch_branch_pr(cwd, entry)
     end, prs)
     local pr = find_pr(open, wt) or find_pr(prs, wt)
     if pr then
-      pr.details = { mergeable = pr.mergeable, statusCheckRollup = pr.statusCheckRollup }
+      local was_queued = entry.pr and entry.pr.number == pr.number and is_queued(entry.pr)
+      pr.details = { mergeable = pr.mergeable, statusCheckRollup = pr.statusCheckRollup, queued = was_queued }
     end
     entry.pr = pr
     redraw_statusline()
+    if pr and pr.state == "OPEN" then
+      fetch_queued(pr, cwd, function(queued)
+        pr.details.queued = queued
+        redraw_statusline()
+      end)
+    end
   end)
 end
 
@@ -724,7 +772,7 @@ function M.pr_status()
     return ""
   end
   local icon, label = pr_summary(entry.pr)
-  return ("%s #%d %s"):format(vim.trim(require("snacks.gh").config().icons.pr[icon]), entry.pr.number, label)
+  return ("%s #%d %s"):format(vim.trim(gh_config().icons.pr[icon]), entry.pr.number, label)
 end
 
 function M.pr_status_color()

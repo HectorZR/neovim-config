@@ -185,11 +185,11 @@ Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude
 | `gt` / `gT` | Next / prev tab |
 
 Panel markers: `●` current, `○` open in a tab, file badge for uncommitted files, ` #N` open PR, `↑N`/`↓N` ahead/behind.
-The PR number color shows its state: red for failed checks, conflicts or requested changes, yellow for running checks,
-green when approved, gray for drafts. The right panel shows the PR status and link, then `git status`. PRs need `gh`.
+The PR number color shows its state: red for failed checks, conflicts or requested changes, yellow for running checks
+or the merge queue, green when approved, gray for drafts. The right panel shows the PR status and link, then `git status`. PRs need `gh`.
 
 The statusline shows the PR of the current branch with its status (`Open`, `Draft`, `Checks failed`, `Approved`,
-`Merged`…). It refreshes in the background when you change tab or return to nvim, and every 2 minutes.
+`Queued`, `Merged`…). It refreshes in the background when you change tab or return to nvim, and every 2 minutes.
 
 Agent state: `󰒓` working, `󰀨` waiting for you, `󰗠` done, `󰝦` idle, `󰋗` unknown.
 
