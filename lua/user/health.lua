@@ -63,6 +63,7 @@ local informational = {
   { name = "opencode", info = "OpenCode CLI — required by opencode.nvim" },
   { name = "herdr", info = "Agent multiplexer — required by the <leader>a keymaps" },
   { name = "claude", info = "Claude Code CLI — started by herdr for each worktree" },
+  { name = "gh", info = "GitHub CLI — PR reviews (octo) and PR status in the worktrees panel" },
 }
 
 local function install_hint(tool)

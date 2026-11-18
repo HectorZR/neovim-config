@@ -183,7 +183,9 @@ Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude
 | `<C-a>` (panel) | Switch and open/focus its Claude in herdr |
 | `gt` / `gT` | Next / prev tab |
 
-Panel markers: `●` current, `○` open in a tab, `~N` uncommitted files, `↑N`/`↓N` ahead/behind.
+Panel markers: `●` current, `○` open in a tab, file badge for uncommitted files, ` #N` open PR, `↑N`/`↓N` ahead/behind.
+The PR number color shows its state: red for failed checks, conflicts or requested changes, yellow for running checks,
+green when approved, gray for drafts. The right panel shows the PR status and link, then `git status`. PRs need `gh`.
 
 Agent state: `󰒓` working, `󰀨` waiting for you, `󰗠` done, `󰝦` idle, `󰋗` unknown.
 

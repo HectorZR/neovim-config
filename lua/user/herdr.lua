@@ -93,15 +93,29 @@ function M.agent_for(path, agents)
   return found and found[1] or nil
 end
 
---- Map of worktree path -> agent status ("working" | "blocked" | "done" | "idle" | "unknown").
-function M.states(paths)
-  local found, ret = by_worktree(M.agents()), {}
-  for _, p in ipairs(paths) do
-    local root = toplevel(p)
-    local agent = root and found[root] and found[root][1]
-    ret[p] = agent and agent.agent_status or nil
+--- Calls cb with a map of worktree path -> agent status, without blocking the editor.
+--- Status is "working" | "blocked" | "done" | "idle" | "unknown".
+function M.states_async(paths, cb)
+  if not M.available() then
+    return
   end
-  return ret
+  run_async({ "agent", "list" }, function(res)
+    local ret = {}
+    for _, agent in ipairs(res and res.agents or {}) do
+      local cwd = vim.fs.normalize(agent.foreground_cwd or agent.cwd or "")
+      -- the longest match, so a nested worktree is not taken for its parent
+      local best
+      for _, path in ipairs(paths) do
+        if (cwd == path or vim.startswith(cwd, path .. "/")) and (not best or #path > #best) then
+          best = path
+        end
+      end
+      if best and not ret[best] then
+        ret[best] = agent.agent_status
+      end
+    end
+    cb(ret)
+  end)
 end
 
 --- The tab left behind when this worktree's Claude exited, so it can be reused.

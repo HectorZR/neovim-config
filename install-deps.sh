@@ -60,7 +60,7 @@ install_macos() {
   fi
 
   local entry tool formula
-  for entry in fd:fd rg:ripgrep node:node lazygit:lazygit herdr:herdr magick:imagemagick; do
+  for entry in fd:fd rg:ripgrep node:node lazygit:lazygit herdr:herdr gh:gh magick:imagemagick; do
     tool="${entry%%:*}"
     formula="${entry##*:}"
     if has "$tool"; then
@@ -206,7 +206,7 @@ verify() {
     missing+=(nvim)
   fi
 
-  local optional=(lazygit herdr claude)
+  local optional=(lazygit herdr claude gh)
   [[ "$OS" == "macos" ]] && optional+=(magick)
   for tool in "${optional[@]}"; do
     if has "$tool"; then ok "$tool"; else warn "$tool not found (optional)"; fi
