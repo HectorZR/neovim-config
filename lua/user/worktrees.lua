@@ -208,6 +208,43 @@ local function find_pr(prs, wt)
   end
 end
 
+--- Open the PR of the current worktree in the browser. An open PR wins over older closed ones.
+function M.open_pr()
+  local cwd, wt = normalize(vim.fn.getcwd()), nil
+  for _, item in ipairs(M.list(cwd) or {}) do
+    local inside = cwd == item.path or vim.startswith(cwd, item.path .. "/")
+    if inside and (not wt or #item.path > #wt.path) then
+      wt = item
+    end
+  end
+  if not wt then
+    return vim.notify("Not inside a git worktree", vim.log.levels.WARN, { title = "Worktrees" })
+  end
+  local args = { "pr", "list", "--json", "number,url,state,headRefName,headRefOid,isCrossRepository" }
+  if wt.detached then
+    vim.list_extend(args, { "--state", "open", "--limit", "200" })
+  else
+    vim.list_extend(args, { "--state", "all", "--limit", "20", "--head", wt.branch })
+  end
+  gh_json(args, wt.path, function(prs)
+    if not prs then
+      return vim.notify("Could not read PRs (is gh logged in?)", vim.log.levels.ERROR, { title = "Worktrees" })
+    end
+    local open = vim.tbl_filter(function(pr)
+      return pr.state == "OPEN"
+    end, prs)
+    local pr = find_pr(open, wt) or find_pr(prs, wt)
+    if not pr then
+      return vim.notify("No PR for " .. wt.branch, vim.log.levels.WARN, { title = "Worktrees" })
+    end
+    local _, err = vim.ui.open(pr.url)
+    if err then
+      return vim.notify(err, vim.log.levels.ERROR, { title = "Worktrees" })
+    end
+    vim.notify(("Opening PR #%d"):format(pr.number), vim.log.levels.INFO, { title = "Worktrees" })
+  end)
+end
+
 --- "success" | "failure" | "pending" | "skipped" for one entry of statusCheckRollup.
 local function check_state(check)
   local result = check.state

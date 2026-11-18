@@ -83,6 +83,7 @@ Run `:WhichKey <leader>` to interactively browse all leader bindings.
 | `<leader>ghr` | Reset hunk |
 | `<leader>gw` | **Worktrees panel** (see below) |
 | `<leader>gW` | New worktree |
+| `<leader>go` | Open the PR of the current branch in the browser |
 
 ---
 
