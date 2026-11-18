@@ -375,7 +375,7 @@ function M.pick()
   local items = {}
   for _, c in ipairs(M.load(wt)) do
     table.insert(items, {
-      text = c.file .. " " .. c.text,
+      text = c.text .. " " .. vim.fs.basename(c.file),
       file = wt .. "/" .. c.file,
       pos = { c.lnum, 0 },
       end_pos = { c.end_lnum, 0 },
@@ -403,8 +403,8 @@ function M.pick()
         or (c.sent and { "➜ ", "DiagnosticHint" } or { "● ", "DiagnosticInfo" })
       return {
         state,
-        { ("%s:%d "):format(c.file, c.lnum), "Directory" },
-        { (c.text:gsub("\n", " ")), c.resolved and "Comment" or "Normal" },
+        { (c.text:gsub("\n", " ")) .. " ", c.resolved and "Comment" or "Normal" },
+        { ("%s:%d"):format(vim.fs.basename(c.file), c.lnum), "Directory" },
       }
     end,
     actions = {
