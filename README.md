@@ -107,13 +107,14 @@ Run `:WhichKey <leader>` to interactively browse all leader bindings.
 
 ### Claude Code via herdr (`<leader>a`)
 
-Needs nvim running inside [herdr](https://github.com/ogulcancelik/herdr). Each worktree gets a Claude tab in nvim's
-herdr workspace, so the diff keeps the full width. Go back to nvim with `Ctrl-b` plus its tab number (usually `Ctrl-b 1`).
-If a prompt can't be delivered, it is kept in the clipboard and in register `r`.
+Needs nvim running inside [herdr](https://github.com/ogulcancelik/herdr). Each worktree gets a tab in nvim's herdr
+workspace with Claude on the left and its own nvim on the right. If a prompt can't be delivered, it is kept in the
+clipboard and in register `r`.
 
 | Key | Action |
 |-----|--------|
 | `<leader>aa` | Open/focus Claude for this worktree |
+| `<leader>az` | Hide or show the Claude chat next to nvim |
 | `<leader>as` | Send pending review comments to Claude (stays in nvim) |
 | `<leader>aS` | Re-send all open review comments |
 | `<leader>aq` | Ask Claude about the line/selection (n, x) |
@@ -172,16 +173,17 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 
 ## Worktrees
 
-One tab per worktree, each with its own working directory. The tabline shows the folder and branch of each tab.
+Inside herdr, each worktree has its own herdr tab (Claude and nvim). Outside herdr, each worktree is a tab of this nvim.
+Use herdr to move around: `Ctrl-b h`/`l` between chat and nvim, `Ctrl-b z` to zoom a pane, `Ctrl-b b` for the sidebar.
 Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude/worktrees/`.
 
 | Key | Action |
 |-----|--------|
 | `<leader>gw` | Open the panel |
-| `<CR>` (panel) | Switch to the worktree's tab (creates it if needed) |
+| `<CR>` (panel) | Go to the worktree's herdr tab, creating chat and nvim if needed |
 | `<C-n>` (panel) | New worktree |
-| `<C-x>` (panel) | Remove worktree |
-| `<C-a>` (panel) | Switch and open/focus its Claude in herdr |
+| `<C-x>` (panel) | Remove worktree and close its herdr tab |
+| `<C-a>` (panel) | Go to the worktree's herdr tab, on the Claude chat |
 | `gt` / `gT` | Next / prev tab |
 
 Panel markers: `●` current, `○` open in a tab, file badge for uncommitted files, ` #N` open PR, `↑N`/`↓N` ahead/behind.

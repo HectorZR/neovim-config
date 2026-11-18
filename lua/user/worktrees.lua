@@ -136,12 +136,23 @@ function M.create(on_done)
       if vim.v.shell_error ~= 0 then
         return vim.notify(out, vim.log.levels.ERROR, { title = "git worktree add" })
       end
-      M.open(path)
+      M.switch(path)
       if on_done then
         on_done(path)
       end
     end)
   end)
+end
+
+--- Go to a worktree: its herdr tab (chat and editor) inside herdr, else a tab of this nvim.
+---@param focus? "agent"|"editor" pane to land on inside herdr
+function M.switch(path, focus)
+  local herdr = require("user.herdr")
+  if herdr.available() then
+    herdr.open_worktree(path, { focus = focus or "editor" })
+  else
+    M.open(path)
+  end
 end
 
 --- Remove a worktree after confirmation; closes its tab.
@@ -158,6 +169,7 @@ function M.remove(item, on_done)
     return
   end
   local main = main_path() or vim.fn.getcwd()
+  local close_herdr_tab = require("user.herdr").tab_closer(item.path)
   local tab = M.find_tab(item.path)
   if tab and #vim.api.nvim_list_tabpages() > 1 then
     vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
@@ -174,6 +186,7 @@ function M.remove(item, on_done)
   if vim.v.shell_error ~= 0 then
     return vim.notify(out, vim.log.levels.ERROR, { title = "git worktree remove" })
   end
+  close_herdr_tab()
   vim.notify("Removed " .. item.path, vim.log.levels.INFO, { title = "Worktrees" })
   if on_done then
     on_done()
@@ -528,7 +541,7 @@ local function cell(text, width, hl)
   return { text .. (" "):rep(width - size), hl }
 end
 
---- Picker panel: <CR> open/switch, <C-n> new, <C-x> remove, <C-a> agent (herdr).
+--- Picker panel: <CR> switch, <C-n> new, <C-x> remove, <C-a> switch and focus Claude.
 --- Opens from `git worktree list` alone; everything slower is loaded in the background.
 function M.pick()
   local list = M.list()
@@ -607,7 +620,7 @@ function M.pick()
     confirm = function(picker, item)
       picker:close()
       if item then
-        M.open(item.wt.path)
+        M.switch(item.wt.path)
       end
     end,
     actions = {
@@ -624,8 +637,7 @@ function M.pick()
       wt_agent = function(picker, item)
         picker:close()
         if item then
-          M.open(item.wt.path)
-          require("user.herdr").focus_agent(item.wt.path)
+          M.switch(item.wt.path, "agent")
         end
       end,
     },

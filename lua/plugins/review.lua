@@ -85,6 +85,13 @@ return {
         desc = "Choose PR threads to send to Claude",
       },
       {
+        "<leader>az",
+        function()
+          require("user.herdr").toggle_chat()
+        end,
+        desc = "Toggle Claude chat next to nvim",
+      },
+      {
         "<leader>aa",
         function()
           require("user.herdr").focus_agent(vim.fn.getcwd())
@@ -157,6 +164,7 @@ return {
         { "<leader>rP", icon = review },
         { "<leader>a", group = "agent (claude)", icon = agent },
         { "<leader>aa", icon = agent },
+        { "<leader>az", icon = agent },
         { "<leader>as", icon = agent },
         { "<leader>aS", icon = agent },
         { "<leader>aq", icon = agent, mode = { "n", "x" } },
