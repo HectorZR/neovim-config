@@ -156,6 +156,9 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 
 ### Inside the diff view (codediff.nvim)
 
+The bottom row has the changed files on the left and the commits of the branch on the right. Choosing a commit
+filters the file list and the diff to it; `All changes` at the top of the list goes back.
+
 | Key | Action |
 |-----|--------|
 | `gf` | Open the file in the previous tab to edit it |
@@ -165,9 +168,11 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 | `<leader>hs` / `<leader>hu` / `<leader>hr` | Stage / unstage / discard hunk |
 | `t` | Toggle inline (default) / side-by-side |
 | `gc` | Toggle compact mode (fold unchanged code) |
-| `<leader>b` / `<leader>e` | Toggle / focus file list |
+| `<leader>b` / `<leader>e` | Toggle (with commits) / focus file list |
 | `g?` | Show all diff keymaps |
 | `q` | Close the diff tab |
+| `<CR>` (commits) | Show the files of that commit, or everything on `All changes` |
+| `R` (commits) | Refresh the commit list |
 
 ---
 

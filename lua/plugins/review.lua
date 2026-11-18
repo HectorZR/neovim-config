@@ -42,6 +42,7 @@ return {
         once = true,
         callback = function()
           require("user.review").setup()
+          require("user.review_panel").setup()
         end,
       })
     end,
@@ -102,6 +103,8 @@ return {
   },
   {
     "esmuellert/codediff.nvim",
+    -- pinned: user.review_panel changes codediff's session data. Re-test the commits panel before moving this.
+    commit = "eee54e78e6f152a6eb03b090e95f7576c96a5ad9",
     cmd = "CodeDiff",
     opts = {
       diff = {
@@ -110,6 +113,9 @@ return {
       },
       explorer = {
         view_mode = "tree",
+        -- bottom row: files on the left, commits on the right (user.review_panel)
+        position = "bottom",
+        height = 12,
         -- nested worktrees show up as untracked dirs; they are not changes to review
         file_filter = {
           ignore = { ".git/**", ".jj/**", ".claude/worktrees/**", ".worktrees/**" },
