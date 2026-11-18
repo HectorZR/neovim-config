@@ -52,7 +52,7 @@ function M.render()
     M.mode(),
     " ",
     M.branch(),
-    "%<%f %h%w%m%r",
+    "%<%{expand('%:~:.')} %h%w%m%r",
     "%=",
     "%{% v:lua.vim.ui.progress_status() %} ",
     "%{% luaeval('next(vim.diagnostic.count()) and vim.diagnostic.status() .. \" \" or \"\"') %}",

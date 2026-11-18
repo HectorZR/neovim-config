@@ -58,13 +58,22 @@ function M.status(path)
   return { dirty = #st, ahead = tonumber(ahead), behind = tonumber(behind) }
 end
 
---- Tab number whose tab-local cwd is `path`, ignoring special tabs (diffs etc).
+--- Diff tabs inherit the cwd of their worktree, so they must not count as its tab.
+local function is_diff_tab(tab)
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype:match("^codediff") or vim.api.nvim_buf_get_name(buf):match("^codediff://") then
+      return true
+    end
+  end
+  return false
+end
+
+--- Tab whose tab-local cwd is `path`, ignoring diff tabs.
 function M.find_tab(path)
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
     local nr = vim.api.nvim_tabpage_get_number(tab)
-    local win = vim.api.nvim_tabpage_get_win(tab)
-    local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-    if not ft:match("^codediff") and normalize(vim.fn.getcwd(-1, nr)) == path then
+    if not is_diff_tab(tab) and normalize(vim.fn.getcwd(-1, nr)) == path then
       return tab
     end
   end
@@ -138,15 +147,20 @@ function M.remove(item, on_done)
   if vim.fn.confirm(msg, "&Yes\n&No", 2) ~= 1 then
     return
   end
+  local main = main_path() or vim.fn.getcwd()
   local tab = M.find_tab(item.path)
   if tab and #vim.api.nvim_list_tabpages() > 1 then
     vim.cmd.tabclose(vim.api.nvim_tabpage_get_number(tab))
+  elseif tab then
+    -- last tab: don't stay inside a directory that is about to disappear
+    vim.cmd("silent! %bdelete")
+    vim.cmd.tcd(vim.fn.fnameescape(main))
   end
   local args = { "worktree", "remove", item.path }
   if st.dirty > 0 then
     table.insert(args, "--force")
   end
-  local out = vim.fn.system(vim.list_extend({ "git", "-C", main_path() or vim.fn.getcwd() }, args))
+  local out = vim.fn.system(vim.list_extend({ "git", "-C", main }, args))
   if vim.v.shell_error ~= 0 then
     return vim.notify(out, vim.log.levels.ERROR, { title = "git worktree remove" })
   end
@@ -163,10 +177,13 @@ function M.pick()
     return vim.notify("Not inside a git repository", vim.log.levels.WARN)
   end
   local current = normalize(vim.fn.getcwd())
+  local herdr = require("user.herdr")
+  local states = herdr.available() and herdr.states(vim.tbl_map(function(w)
+    return w.path
+  end, list)) or {}
   local items = {}
   for _, wt in ipairs(list) do
     local st = M.status(wt.path)
-    local agent = package.loaded["user.herdr"] and require("user.herdr").agent_state(wt.path) or nil
     local log = git({ "log", "--oneline", "--decorate", "-15" }, wt.path) or {}
     local changes = git({ "status", "--short" }, wt.path) or {}
     local lines = { "# " .. wt.path, "", "## Changes (" .. #changes .. ")" }
@@ -184,7 +201,7 @@ function M.pick()
       text = wt.branch .. " " .. wt.path,
       wt = wt,
       st = st,
-      agent = agent,
+      agent = states[wt.path],
       current = wt.path == current,
       open = M.find_tab(wt.path) ~= nil,
       preview = { text = table.concat(lines, "\n"), ft = "markdown" },
@@ -253,40 +270,41 @@ function M.pick()
   })
 end
 
+-- branch per cwd: the tabline redraws constantly, so git only runs on a cache miss
+local branches = {}
+
+local function branch_of(cwd)
+  if branches[cwd] == nil then
+    local out = vim.fn.systemlist({ "git", "-C", cwd, "branch", "--show-current" })
+    branches[cwd] = vim.v.shell_error == 0 and out[1] or ""
+  end
+  return branches[cwd]
+end
+
 --- Tabline: one label per tab with the worktree (branch) it belongs to.
 function M.tabline()
   local s = {}
-  for nr = 1, vim.fn.tabpagenr("$") do
-    local cwd = vim.fn.getcwd(-1, nr)
-    local win = vim.fn.tabpagewinnr(nr)
-    local buf = vim.fn.tabpagebuflist(nr)[win]
-    local ft = vim.bo[buf].filetype
-    local label
-    if ft:match("^codediff") then
-      label = " diff"
-    else
-      local head = vim.fn.systemlist({ "git", "-C", cwd, "branch", "--show-current" })[1]
-      label = vim.fn.fnamemodify(cwd, ":t") .. ((vim.v.shell_error == 0 and head and head ~= "") and ("  " .. head) or "")
+  local current = vim.api.nvim_get_current_tabpage()
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    local nr = vim.api.nvim_tabpage_get_number(tab)
+    local label = "diff"
+    if not is_diff_tab(tab) then
+      local cwd = vim.fn.getcwd(-1, nr)
+      local head = branch_of(cwd)
+      label = vim.fn.fnamemodify(cwd, ":t") .. (head ~= "" and ("  " .. head) or "")
     end
-    local hl = nr == vim.fn.tabpagenr() and "%#TabLineSel#" or "%#TabLine#"
+    local hl = tab == current and "%#TabLineSel#" or "%#TabLine#"
     table.insert(s, ("%s%%%dT %d %s %%T"):format(hl, nr, nr, label))
   end
   return table.concat(s) .. "%#TabLineFill#"
 end
 
--- branch lookups shell out, so cache the rendered tabline and refresh on relevant events
-local cached
-function M.render_tabline()
-  return cached or M.tabline()
-end
-
 function M.setup()
-  vim.o.tabline = "%!v:lua.require('user.worktrees').render_tabline()"
-  vim.api.nvim_create_autocmd({ "TabEnter", "TabNew", "TabClosed", "DirChanged", "FocusGained", "BufEnter" }, {
+  vim.o.tabline = "%!v:lua.require('user.worktrees').tabline()"
+  vim.api.nvim_create_autocmd({ "DirChanged", "FocusGained", "TermClose" }, {
     group = vim.api.nvim_create_augroup("user_worktrees_tabline", { clear = true }),
     callback = function()
-      cached = nil
-      cached = M.tabline()
+      branches = {}
       vim.cmd.redrawtabline()
     end,
   })

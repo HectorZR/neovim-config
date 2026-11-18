@@ -14,7 +14,71 @@ local function default_branch()
   return "HEAD"
 end
 
+--- Current line, or the visual selection's line range (leaves visual mode).
+local function range()
+  local mode = vim.fn.mode()
+  if mode:match("[vV\22]") then
+    local a, b = vim.fn.line("v"), vim.fn.line(".")
+    vim.api.nvim_feedkeys(vim.keycode("<esc>"), "nx", false)
+    return math.min(a, b), math.max(a, b)
+  end
+  local l = vim.fn.line(".")
+  return l, l
+end
+
+local function review(fn)
+  return function()
+    require("user.review")[fn](range())
+  end
+end
+
 return {
+  {
+    -- review comments + herdr bridge (local modules, hooked on a plugin that is always loaded)
+    "folke/snacks.nvim",
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        once = true,
+        callback = function()
+          require("user.review").setup()
+        end,
+      })
+    end,
+    keys = {
+      { "<leader>rc", review("add"), mode = { "n", "x" }, desc = "Add review comment" },
+      { "<leader>rd", review("delete_at_cursor"), desc = "Delete review comment" },
+      {
+        "<leader>rl",
+        function()
+          require("user.review").pick()
+        end,
+        desc = "List review comments",
+      },
+      {
+        "<leader>as",
+        function()
+          require("user.review").send()
+        end,
+        desc = "Send review comments to Claude",
+      },
+      {
+        "<leader>aS",
+        function()
+          require("user.review").send({ all = true })
+        end,
+        desc = "Re-send all open comments to Claude",
+      },
+      { "<leader>aq", review("ask"), mode = { "n", "x" }, desc = "Ask Claude about line/selection" },
+      {
+        "<leader>aa",
+        function()
+          require("user.herdr").focus_agent(vim.fn.getcwd())
+        end,
+        desc = "Open/focus Claude for this worktree (herdr)",
+      },
+    },
+  },
   {
     "esmuellert/codediff.nvim",
     cmd = "CodeDiff",
@@ -25,6 +89,10 @@ return {
       },
       explorer = {
         view_mode = "tree",
+        -- nested worktrees show up as untracked dirs; they are not changes to review
+        file_filter = {
+          ignore = { ".git/**", ".jj/**", ".claude/worktrees/**", ".worktrees/**" },
+        },
       },
       keymaps = {
         view = {
@@ -60,6 +128,11 @@ return {
   },
   {
     "folke/which-key.nvim",
-    opts = { spec = { { "<leader>r", group = "review", icon = { icon = " ", color = "orange" } } } },
+    opts = {
+      spec = {
+        { "<leader>r", group = "review", icon = { icon = " ", color = "orange" } },
+        { "<leader>a", group = "agent (claude)", icon = { icon = "󰚩 ", color = "purple" } },
+      },
+    },
   },
 }
