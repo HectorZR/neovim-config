@@ -1,7 +1,16 @@
 return {
   "nvim-lualine/lualine.nvim",
   opts = function(_, opts)
-    opts.sections.lualine_y = {}
+    opts.sections.lualine_y = {
+      {
+        function()
+          return require("user.worktrees").pr_status()
+        end,
+        color = function()
+          return require("user.worktrees").pr_status_color()
+        end,
+      },
+    }
     opts.sections.lualine_z = {
       {
         "progress",

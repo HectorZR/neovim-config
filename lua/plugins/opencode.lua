@@ -1,6 +1,5 @@
 return {
   "NickvanDyke/opencode.nvim",
-  enabled = vim.fn.has("win32") == 0,
   dependencies = {
     { "folke/snacks.nvim", opts = { input = {}, picker = {}, terminal = {} } },
   },
@@ -46,7 +45,7 @@ return {
       desc = "OpenCode ask about buffer",
     },
     {
-      "<leader>ip",
+      "<leader>iP",
       function()
         require("opencode").prompt("@this", { submit = true })
       end,

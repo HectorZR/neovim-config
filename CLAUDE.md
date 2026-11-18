@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Neovim configuration built on [LazyVim](https://lazyvim.github.io/). LazyVim provides sensible defaults; this repo customizes and extends those defaults.
+This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.io/), tuned for reviewing agent-written code and writing prose. LazyVim provides sensible defaults; this repo customizes and extends those defaults, and disables the plugins it does not use (`lua/plugins/disabled.lua`).
 
 ## Architecture
 
@@ -14,6 +14,11 @@ This is a Neovim configuration built on [LazyVim](https://lazyvim.github.io/). L
 - `lua/config/options.lua` — custom options layered on top of LazyVim defaults
 - `lua/config/autocmds.lua` — custom autocommands layered on top of LazyVim defaults
 - `lua/plugins/` — each file returns a plugin spec table; auto-imported by lazy.nvim
+- `lua/user/worktrees.lua` — one tab per git worktree, snacks picker panel, tabline
+- `lua/user/review.lua` — line review comments, stored in `stdpath("cache")/review`, 14-day retention
+- `lua/user/herdr.lua` — herdr CLI bridge: one Claude tab per worktree in nvim's workspace
+- `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
+- `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
 
 ## Plugin Customization Pattern
 
@@ -52,21 +57,22 @@ stylua lua/
 ## Key Customizations
 
 - **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
-- **Formatter**: `conform.nvim` runs `prettier` for JS/TS/JSX/TSX files
-- **AI**: GitHub Copilot (`copilot.lua`) + CopilotChat with custom prompts
-- **Editor extras**: `mini.move` (move lines/selections), `vim-visual-multi` (multi-cursor)
-- **Statusline**: lualine with `lualine_y` cleared, `lualine_z` showing progress + location
+- **Picker**: `snacks.picker` only
+- **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
+- **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
+- **Writing**: `render-markdown.nvim`, Spanish + English spelling, `ltex_plus` grammar checks
 - **Dashboard**: custom ASCII header via `snacks.nvim`
 
-## WSL
+## Keymaps
 
-Treesitter compiles parsers natively and requires `gcc`. Without it, syntax highlighting and noice.nvim command-line highlighting silently fail.
+`README.md` is the keymap cheatsheet. Update it whenever a keymap is added, changed or removed, and give every
+keymap a `desc` so it shows up in which-key.
 
-```bash
-sudo apt install gcc
-```
+## Supported systems
 
-After installing, run `:TSInstall javascript typescript tsx regex vim` inside Neovim.
+macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps.sh` covers both. Windows and WSL are not supported.
+
+Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xcode Command Line Tools on macOS).
 
 ## lazy-lock.json
 
