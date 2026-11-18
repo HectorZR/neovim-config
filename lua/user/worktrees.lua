@@ -500,21 +500,21 @@ function M.pick()
     layout = { preset = "default" },
     format = function(item)
       local H, config = Snacks.picker.highlight, require("snacks.gh").config()
-      local agent = agent_icons[item.agent] or { " ", "Normal" }
+      local agent = agent_icons[item.agent] or { " " }
       local st, pr = item.st, item.pr
       local checks = pr and checks_state(pr)
-      local check_hl = checks and "SnacksGhCheck" .. Snacks.picker.util.title(checks) or "Normal"
+      local check_hl = checks and "SnacksGhCheck" .. Snacks.picker.util.title(checks) or nil
       local pr_icon = pr and vim.trim(config.icons.pr[pr.isDraft and "draft" or "open"]) or ""
       local ret = {
         { item.current and "● " or (item.open and "○ " or "  "), "Special" },
-        cell(pr_icon, 2, pr and (pr.isDraft and "SnacksGhPrDraft" or "SnacksGhPrOpen") or "Normal"),
+        cell(pr_icon, 2, pr and (pr.isDraft and "SnacksGhPrDraft" or "SnacksGhPrOpen") or nil),
         cell(
           item.label,
           branch_width + 1,
-          item.current and "Title" or (item.wt.detached and "SnacksPickerDimmed" or "Normal")
+          item.current and "Title" or (item.wt.detached and "SnacksPickerDimmed" or nil)
         ),
         { agent[1] .. " ", agent[2] },
-        cell(pr and "#" .. pr.number or "", 8, pr and pr_highlight(pr) or "Normal"),
+        cell(pr and "#" .. pr.number or "", 8, pr and pr_highlight(pr) or nil),
         cell(checks and vim.trim(config.icons.checks[checks]) or "", 2, check_hl),
       }
       -- the badge caps take 2 cells and it ends with a space
