@@ -156,19 +156,26 @@ function M.focus_agent(path)
   end
 end
 
+--- Keep an undelivered prompt: always in register r, and in the clipboard when there is one.
+local function keep_prompt(text, reason, level)
+  vim.fn.setreg("r", text)
+  local copied = vim.fn.has("clipboard") == 1 and pcall(vim.fn.setreg, "+", text)
+  local where = copied and "Prompt copied to the clipboard."
+    or 'No clipboard available: prompt saved, paste it with "rp.'
+  vim.notify(reason .. "\n" .. where, level or vim.log.levels.INFO, { title = "herdr" })
+end
+
 --- Send a prompt to the worktree's agent without leaving nvim. Falls back to the clipboard.
 --- `on_sent` only runs when the agent actually received the prompt.
 function M.send(path, text, on_sent)
   path = path or vim.fn.getcwd()
   if not M.available() then
-    vim.fn.setreg("+", text)
-    return vim.notify("Not inside herdr: prompt copied to clipboard", vim.log.levels.INFO)
+    return keep_prompt(text, "nvim is not running inside herdr.")
   end
   local function prompt(target)
     run_async({ "agent", "prompt", target, text }, function(_, err)
       if err then
-        vim.fn.setreg("+", text)
-        vim.notify(("herdr: %s\nPrompt copied to clipboard."):format(err), vim.log.levels.WARN)
+        keep_prompt(text, err, vim.log.levels.WARN)
       else
         vim.notify("Sent to " .. target, vim.log.levels.INFO, { title = "herdr" })
         if on_sent then
@@ -185,8 +192,7 @@ function M.send(path, text, on_sent)
     if ready then
       prompt(name)
     else
-      vim.fn.setreg("+", text)
-      vim.notify("Agent not ready yet: prompt copied to clipboard, paste it once it is", vim.log.levels.WARN)
+      keep_prompt(text, "The agent is not ready yet.", vim.log.levels.WARN)
     end
   end)
 end

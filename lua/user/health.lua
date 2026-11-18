@@ -67,6 +67,8 @@ local tools = {
 local informational = {
   { name = "go", info = "Required by gopls LSP server" },
   { name = "opencode", info = "OpenCode CLI — required by opencode.nvim" },
+  { name = "herdr", info = "Agent multiplexer — required by the <leader>a keymaps" },
+  { name = "claude", info = "Claude Code CLI — started by herdr for each worktree" },
 }
 
 local function install_hint(tool)

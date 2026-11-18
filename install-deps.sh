@@ -313,6 +313,24 @@ else
   warn "claude CLI not found. Install via: https://claude.ai/download"
 fi
 
+# ── 13. Spanish spell file ─────────────────────────────────────────────────────
+
+echo ""
+info "==> Spanish spell file (avoids the download prompt in prose buffers)"
+
+SPELL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/spell"
+if [[ -f "$SPELL_DIR/es.utf-8.spl" ]]; then
+  ok "Spanish spell file already installed"
+else
+  mkdir -p "$SPELL_DIR"
+  if curl -fsSL -o "$SPELL_DIR/es.utf-8.spl" https://ftp.nluug.nl/pub/vim/runtime/spell/es.utf-8.spl; then
+    ok "Spanish spell file installed"
+  else
+    rm -f "$SPELL_DIR/es.utf-8.spl"
+    warn "Could not download it; Neovim will offer to download it on first use"
+  fi
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 
 echo ""

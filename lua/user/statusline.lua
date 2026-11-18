@@ -55,7 +55,7 @@ function M.render()
     "%<%{expand('%:~:.')} %h%w%m%r",
     "%=",
     "%{% v:lua.vim.ui.progress_status() %} ",
-    "%{% luaeval('next(vim.diagnostic.count()) and vim.diagnostic.status() .. \" \" or \"\"') %}",
+    '%{% luaeval(\'next(vim.diagnostic.count()) and vim.diagnostic.status() .. " " or ""\') %}',
     "%l:%c %P ",
   })
 end

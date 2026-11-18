@@ -182,28 +182,31 @@ function M.add(line1, line2)
   end
   line1 = line1 or vim.fn.line(".")
   line2 = line2 or line1
-  Snacks.input({ prompt = ("Comment %s:%d%s"):format(rel, line1, line2 ~= line1 and ("-" .. line2) or "") }, function(text)
-    if not text or vim.trim(text) == "" then
-      return
+  Snacks.input(
+    { prompt = ("Comment %s:%d%s"):format(rel, line1, line2 ~= line1 and ("-" .. line2) or "") },
+    function(text)
+      if not text or vim.trim(text) == "" then
+        return
+      end
+      M.sync(buf)
+      local comments = M.load(wt)
+      local max = 0
+      for _, c in ipairs(comments) do
+        max = math.max(max, c.id)
+      end
+      table.insert(comments, {
+        id = max + 1,
+        file = rel,
+        lnum = line1,
+        end_lnum = line2,
+        code = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false),
+        text = text,
+        created = os.time(),
+      })
+      M.save(wt, comments)
+      M.render(buf)
     end
-    M.sync(buf)
-    local comments = M.load(wt)
-    local max = 0
-    for _, c in ipairs(comments) do
-      max = math.max(max, c.id)
-    end
-    table.insert(comments, {
-      id = max + 1,
-      file = rel,
-      lnum = line1,
-      end_lnum = line2,
-      code = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false),
-      text = text,
-      created = os.time(),
-    })
-    M.save(wt, comments)
-    M.render(buf)
-  end)
+  )
 end
 
 --- Delete the comment(s) on the cursor line.
@@ -242,7 +245,8 @@ function M.format(comments)
     "",
   }
   for _, c in ipairs(comments) do
-    local loc = c.lnum == c.end_lnum and ("%s:%d"):format(c.file, c.lnum) or ("%s:%d-%d"):format(c.file, c.lnum, c.end_lnum)
+    local loc = c.lnum == c.end_lnum and ("%s:%d"):format(c.file, c.lnum)
+      or ("%s:%d-%d"):format(c.file, c.lnum, c.end_lnum)
     table.insert(out, ("## %d. %s"):format(c.id, loc))
     table.insert(out, c.text)
     if c.code and #c.code > 0 then
@@ -345,7 +349,8 @@ function M.pick()
     items = items,
     format = function(item)
       local c = item.comment
-      local state = c.resolved and { "✓ ", "DiagnosticOk" } or (c.sent and { "➜ ", "DiagnosticHint" } or { "● ", "DiagnosticInfo" })
+      local state = c.resolved and { "✓ ", "DiagnosticOk" }
+        or (c.sent and { "➜ ", "DiagnosticHint" } or { "● ", "DiagnosticInfo" })
       return {
         state,
         { ("%s:%d "):format(c.file, c.lnum), "Directory" },
