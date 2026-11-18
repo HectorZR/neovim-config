@@ -1,5 +1,5 @@
--- Prose: rendered markdown (agent plans, docs) and grammar checking in Spanish/English.
-local languages = { "es", "en-US" }
+-- Prose: rendered markdown (agent plans, docs) and grammar checking in English (default) and Spanish.
+local languages = { "en-US", "es" } -- first one is the default
 
 --- Switch the grammar language of the running ltex server.
 local function toggle_language()
@@ -40,7 +40,7 @@ return {
           filetypes = { "markdown", "text", "gitcommit" },
           settings = { ltex = { language = languages[1] } },
           keys = {
-            { "<leader>cG", toggle_language, desc = "Toggle Grammar Language (es/en)" },
+            { "<leader>cG", toggle_language, desc = "Toggle Grammar Language (en/es)" },
           },
         },
       },

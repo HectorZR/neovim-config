@@ -178,7 +178,7 @@ Markdown, text and git commit buffers get word wrap, Spanish + English spelling 
 | `<leader>um` | Toggle rendered markdown |
 | `<leader>uz` | Toggle zen mode |
 | `<leader>us` | Toggle spelling |
-| `<leader>cG` | Toggle grammar language (es/en) |
+| `<leader>cG` | Toggle grammar language (English by default, or Spanish) |
 | `z=` | Spelling suggestions |
 | `zg` | Add word to dictionary |
 

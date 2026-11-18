@@ -128,11 +128,23 @@ return {
   },
   {
     "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "<leader>r", group = "review", icon = { icon = " ", color = "orange" } },
-        { "<leader>a", group = "agent (claude)", icon = { icon = "󰚩 ", color = "purple" } },
-      },
-    },
+    opts = function(_, opts)
+      -- keys defined on the snacks spec would otherwise show the snacks icon
+      local review = { icon = " ", color = "orange" }
+      local agent = { icon = "󰚩 ", color = "purple" }
+      opts.spec = opts.spec or {}
+      vim.list_extend(opts.spec, {
+        { "<leader>r", group = "review", icon = review },
+        { "<leader>rc", icon = review, mode = { "n", "x" } },
+        { "<leader>rd", icon = review },
+        { "<leader>rl", icon = review },
+        { "<leader>rH", icon = review },
+        { "<leader>a", group = "agent (claude)", icon = agent },
+        { "<leader>aa", icon = agent },
+        { "<leader>as", icon = agent },
+        { "<leader>aS", icon = agent },
+        { "<leader>aq", icon = agent, mode = { "n", "x" } },
+      })
+    end,
   },
 }
