@@ -157,8 +157,8 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 ### Inside the diff view (codediff.nvim)
 
 The bottom row has the changed files on the left and the commits of the branch on the right. Choosing a commit
-filters the file list and the diff to it. `Untracked changes` shows the work not committed yet, including new files,
-and `All changes` goes back to the original comparison.
+filters the file list and the diff to it. `All changes` shows everything since the branch was created, committed or
+not, and `Untracked changes` shows only the work not committed yet, including new files.
 
 | Key | Action |
 |-----|--------|

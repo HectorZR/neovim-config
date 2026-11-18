@@ -1,8 +1,8 @@
 -- Commits panel of the review tab: sits to the right of the codediff file list, in the bottom row.
 -- It follows the file list: it appears, hides and goes away with it.
--- Choosing a commit points that file list at the commit; "Untracked changes" shows the work not
--- committed yet, and "All changes" goes back to the original comparison. This changes codediff's
--- session data, so codediff is pinned in plugins/review.lua.
+-- Choosing a row points that file list at it: "All changes" is everything since the branch was
+-- created, committed or not; "Untracked changes" is the work not committed yet; a commit is just
+-- that commit. This changes codediff's session data, so codediff is pinned in plugins/review.lua.
 local M = {}
 
 local FILETYPE = "codediff-commits"
@@ -11,9 +11,10 @@ local ns = vim.api.nvim_create_namespace("user.review_panel")
 local commits = {} -- buffer -> commits on screen
 local bases = {} -- buffer -> branch the commits are compared with
 local shown = {} -- buffer -> { base, items } last drawn
-local tab_states = {} -- tab -> { original = comparison the tab opened with, selected = commit hash }
+local tab_states = {} -- tab -> { selected = nil (All changes) | UNCOMMITTED | OTHER | commit hash }
 local EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 local UNCOMMITTED = "uncommitted" -- value of `selected` for the "Untracked changes" row
+local OTHER = "other" -- the tab opened on a comparison that matches no row
 local FIRST_COMMIT_ROW = 4
 
 local function find_windows(tab)
@@ -46,18 +47,49 @@ local function base_ref(cwd)
   end
 end
 
+--- The commit this branch was created from.
+local function fork_point(cwd, base)
+  if not base then
+    return nil
+  end
+  local res = vim.system({ "git", "-C", cwd, "merge-base", base, "HEAD" }, { text = true }):wait()
+  return res.code == 0 and vim.trim(res.stdout) or nil
+end
+
+--- Selection state of a tab, starting from the comparison the tab was opened with.
+local function tab_state(tab, buf)
+  if tab_states[tab] then
+    return tab_states[tab]
+  end
+  local session = require("codediff.ui.lifecycle").get_session(tab)
+  local data = session and session.panel and session.panel.data
+  if not data then
+    return {}
+  end
+  local state = {}
+  local working = data.target_revision == nil or data.target_revision == "WORKING"
+  if not data.base_revision and working then
+    state.selected = UNCOMMITTED
+  elseif not (working and data.base_revision == fork_point(vim.fn.getcwd(), bases[buf])) then
+    state.selected = OTHER
+  end
+  tab_states[tab] = state
+  return state
+end
+
 local function draw(buf, base, items)
   if not vim.api.nvim_buf_is_valid(buf) then
     return
   end
-  local state = tab_states[vim.api.nvim_get_current_tabpage()] or {}
+  local state = tab_state(vim.api.nvim_get_current_tabpage(), buf)
+  local all_selected = state.selected == nil
   local function marker(active)
     return { active and "● " or "  ", "Special" }
   end
   local title = base and ("Commits since %s (%d)"):format(base, #items) or ("Commits (%d)"):format(#items)
   local lines = {
     { { title, "Directory" } },
-    { marker(not state.selected), { "All changes", state.selected and "Normal" or "Title" } },
+    { marker(all_selected), { "All changes", all_selected and "Title" or "Normal" } },
     {
       marker(state.selected == UNCOMMITTED),
       { "Untracked changes", state.selected == UNCOMMITTED and "Title" or "Normal" },
@@ -74,7 +106,7 @@ local function draw(buf, base, items)
   Snacks.picker.highlight.render(buf, ns, lines)
   local win = vim.fn.bufwinid(buf)
   if first_draw and win ~= -1 then
-    vim.api.nvim_win_set_cursor(win, { 2, 0 })
+    vim.api.nvim_win_set_cursor(win, { state.selected == UNCOMMITTED and 3 or 2, 0 })
   end
 end
 
@@ -137,26 +169,22 @@ local function select_row(buf)
   if row < 2 or (row >= FIRST_COMMIT_ROW and not item) then
     return
   end
-  local session = require("codediff.ui.lifecycle").get_session(tab)
-  local data = session and session.panel and session.panel.data
-  if not data then
-    return
-  end
-  local state = tab_states[tab] or {}
+  local state = tab_state(tab, buf)
   tab_states[tab] = state
   local selected = item and item.full or (row == 3 and UNCOMMITTED or nil)
   if state.selected == selected then
     return
   end
-  state.original = state.original
-    or { base = data.base_revision, target = data.target_revision, source = data.source_revisions }
-  local comparison = state.original
-  if selected == UNCOMMITTED then
-    comparison = {} -- no revisions: codediff compares the working tree with HEAD
-  elseif item then
+  local comparison = {} -- no revisions: codediff compares the working tree with HEAD
+  if item then
     local parent = vim.system({ "git", "rev-parse", "--verify", "--quiet", item.full .. "^" }, { text = true }):wait()
     -- a first commit has no parent: compare it with git's empty tree
     comparison = { base = parent.code == 0 and vim.trim(parent.stdout) or EMPTY_TREE, target = item.full }
+  elseif selected == nil then
+    local fork = fork_point(vim.fn.getcwd(), bases[buf])
+    if fork then
+      comparison = { base = fork, target = "WORKING", source = { original = fork, modified = "WORKING" } }
+    end
   end
   state.selected = selected
   compare(tab, comparison)
