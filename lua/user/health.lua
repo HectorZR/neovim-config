@@ -27,19 +27,12 @@ local tools = {
     info = "Terminal UI for git — optional",
   },
   {
-    name = "prettier",
-    required = false,
-    brew = "npm install -g prettier",
-    apt = "npm install -g prettier",
-    info = "JS/TS formatter used by conform.nvim — optional",
-  },
-  {
     name = "gcc",
     required = is_linux,
     brew = "xcode-select --install",
     apt = "gcc",
     info = "C compiler for tree-sitter parsers"
-      .. (is_linux and " — required on Linux/WSL" or " — macOS uses Xcode CLT"),
+      .. (is_linux and " — required on Linux" or " — macOS uses Xcode CLT"),
   },
   {
     name = "rg",
@@ -53,19 +46,20 @@ local tools = {
     required = false,
     brew = "node",
     apt = "nodejs",
-    info = "Required by Copilot, LSP servers (tsserver/eslint), and prettier",
+    info = "Required by LSP servers installed through Mason",
   },
   {
     name = "npm",
     required = false,
     brew = "node",
     apt = "npm",
-    info = "Required to install prettier and other JS tools",
+    info = "Required by Mason to install JS-based tools",
   },
 }
 
 local informational = {
   { name = "go", info = "Required by gopls LSP server" },
+  { name = "magick", info = "ImageMagick — converts images for snacks.image (macOS)" },
   { name = "opencode", info = "OpenCode CLI — required by opencode.nvim" },
   { name = "herdr", info = "Agent multiplexer — required by the <leader>a keymaps" },
   { name = "claude", info = "Claude Code CLI — started by herdr for each worktree" },
@@ -86,6 +80,13 @@ local function executable(name)
 end
 
 function M.check()
+  vim.health.start("user: Neovim version")
+  if vim.fn.has("nvim-0.12") == 1 then
+    vim.health.ok("Neovim 0.12 or newer")
+  else
+    vim.health.error("This config needs Neovim 0.12 or newer. Run ./install-deps.sh")
+  end
+
   vim.health.start("user: external dependencies")
 
   for _, tool in ipairs(tools) do

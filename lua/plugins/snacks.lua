@@ -5,7 +5,7 @@ return {
     opts.picker.sources = opts.picker.sources or {}
     -- macOS: Option+H sends ˙ (U+02D9), Option+I sends ˆ (U+02C6) instead of ESC-prefixed
     -- sequences. Map these Unicode chars to the same toggle actions as <a-h> / <a-i>.
-    -- On Windows/Linux, Alt+H/I send ESC+h/i correctly so <a-h>/<a-i> still handle those.
+    -- On Linux, Alt+H/I send ESC+h/i correctly so <a-h>/<a-i> still handle those.
     local macos_picker_keys = {
       ["˙"] = { "toggle_hidden", mode = { "i", "n" } }, -- Option+H (macOS US layout)
       ["©"] = { "toggle_ignored", mode = { "i", "n" } }, -- Option+G (macOS US layout) — Option+I is a dead key on macOS
@@ -45,17 +45,8 @@ return {
       dev = { "~/dev", "~/projects", "~/Developer" },
     })
 
-    local function is_wsl()
-      local f = io.open("/proc/version", "r")
-      if f then
-        local content = f:read("*a")
-        f:close()
-        return content:lower():find("microsoft") ~= nil
-      end
-      return false
-    end
     opts.image = opts.image or {}
-    opts.image.enabled = not is_wsl()
+    opts.image.enabled = true
 
     opts.dashboard = opts.dashboard or {}
     opts.dashboard.enabled = true

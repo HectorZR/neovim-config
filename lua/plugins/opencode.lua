@@ -1,6 +1,5 @@
 return {
   "NickvanDyke/opencode.nvim",
-  enabled = vim.fn.has("win32") == 0,
   dependencies = {
     { "folke/snacks.nvim", opts = { input = {}, picker = {}, terminal = {} } },
   },

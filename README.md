@@ -235,7 +235,6 @@ Plugins only load when their dependency is present:
 | `<leader>a` agent keymaps | `herdr` + `claude` CLI |
 | wakatime | `~/.wakatime.cfg` with `api_key` |
 | gopls LSP | `go` executable |
-| opencode.nvim | not Windows |
 
 ---
 

@@ -56,7 +56,6 @@ stylua lua/
 ## Key Customizations
 
 - **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
-- **Formatter**: `conform.nvim` runs `prettier` for JS/TS/JSX/TSX files
 - **Picker**: `snacks.picker` only
 - **Review**: `codediff.nvim` under `<leader>r`, plus review comments
 - **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
@@ -68,15 +67,11 @@ stylua lua/
 `README.md` is the keymap cheatsheet. Update it whenever a keymap is added, changed or removed, and give every
 keymap a `desc` so it shows up in which-key.
 
-## WSL
+## Supported systems
 
-Treesitter compiles parsers natively and requires `gcc`. Without it, syntax highlighting silently fails.
+macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps.sh` covers both. Windows and WSL are not supported.
 
-```bash
-sudo apt install gcc
-```
-
-After installing, run `:TSInstall javascript typescript tsx regex vim` inside Neovim.
+Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xcode Command Line Tools on macOS).
 
 ## lazy-lock.json
 
