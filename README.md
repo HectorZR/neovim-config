@@ -213,7 +213,7 @@ Markdown, text and git commit buffers get word wrap, Spanish + English spelling 
 | `<S-CR>` (insert) | New line below (stay in insert mode) |
 | `<C-CR>` (insert) | New line above (stay in insert mode) |
 | `<A-j>` / `<A-k>` | Move line/selection down/up |
-| `gc` / `gcc` | Comment selection / line (native) |
+| `gc` / `gcc` | Comment selection / line |
 
 ---
 
@@ -254,14 +254,11 @@ Plugins only load when their dependency is present:
 
 ---
 
-## Native Neovim 0.12 replacements
+## Disabled plugins
 
-Requires Neovim 0.12+. These LazyVim plugins are disabled in `lua/plugins/disabled.lua`:
+Requires Neovim 0.12+. These plugins are disabled in `lua/plugins/disabled.lua`:
 
 | Disabled | Replaced by |
 |----------|-------------|
-| noice.nvim | Native `ui2` cmdline/messages (`g<` opens the message pager) |
-| lualine.nvim | `lua/user/statusline.lua` on native helpers |
-| ts-comments.nvim | Native `gc` / `gcc` |
 | bufferline.nvim | Tabline with one tab per worktree |
 | fzf-lua | snacks.picker |

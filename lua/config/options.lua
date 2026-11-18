@@ -10,14 +10,5 @@ vim.g.lazyvim_picker = "snacks"
 
 vim.opt.wrap = true
 
--- Native 0.12 cmdline/messages UI (replaces noice.nvim). `g<` opens the message pager.
-if vim.fn.has("nvim-0.12") == 1 then
-  require("vim._core.ui2").enable({})
-end
-
--- lualine is disabled: show the mode in our own statusline
-vim.opt.showmode = false
-require("user.statusline").setup()
-
 -- one tab per git worktree, labelled with its branch (see user.worktrees)
 require("user.worktrees").setup()

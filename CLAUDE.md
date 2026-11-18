@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.io/), tuned for reviewing agent-written code and writing prose. LazyVim provides sensible defaults; this repo customizes and extends those defaults, and disables plugins Neovim 0.12 covers natively (`lua/plugins/disabled.lua`).
+This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.io/), tuned for reviewing agent-written code and writing prose. LazyVim provides sensible defaults; this repo customizes and extends those defaults, and disables the plugins it does not use (`lua/plugins/disabled.lua`).
 
 ## Architecture
 
@@ -14,7 +14,6 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/config/options.lua` — custom options layered on top of LazyVim defaults
 - `lua/config/autocmds.lua` — custom autocommands layered on top of LazyVim defaults
 - `lua/plugins/` — each file returns a plugin spec table; auto-imported by lazy.nvim
-- `lua/user/statusline.lua` — statusline on native helpers (replaces lualine)
 - `lua/user/worktrees.lua` — one tab per git worktree, snacks picker panel, tabline
 - `lua/user/review.lua` — line review comments, stored in `stdpath("cache")/review`, 14-day retention
 - `lua/user/herdr.lua` — herdr CLI bridge: one workspace running Claude per worktree
