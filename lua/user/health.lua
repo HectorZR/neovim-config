@@ -17,14 +17,7 @@ local tools = {
     required = true,
     brew = "fd",
     apt = "fd-find",
-    info = "Fast file finder used by fzf-lua and telescope",
-  },
-  {
-    name = "fzf",
-    required = true,
-    brew = "fzf",
-    apt = "fzf",
-    info = "Fuzzy finder — required by fzf-lua",
+    info = "Fast file finder used by snacks.picker",
   },
   {
     name = "lazygit",

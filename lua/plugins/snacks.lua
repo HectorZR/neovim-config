@@ -23,6 +23,24 @@ return {
         picker:toggle("preview", { enable = false })
       end,
     })
+    -- Ported from the old fzf-lua fd_opts: show hidden files, follow symlinks, skip build/vendor dirs
+    opts.picker.sources.files = vim.tbl_deep_extend("force", opts.picker.sources.files or {}, {
+      hidden = true,
+      follow = true,
+      exclude = {
+        ".git",
+        "node_modules",
+        "dist",
+        "build",
+        ".next",
+        ".nuxt",
+        "coverage",
+        ".cache",
+        "__pycache__",
+        ".venv",
+        "vendor",
+      },
+    })
     opts.picker.sources.projects = vim.tbl_deep_extend("force", opts.picker.sources.projects or {}, {
       dev = { "~/dev", "~/projects", "~/Developer" },
     })

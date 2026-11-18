@@ -138,25 +138,6 @@ elif [[ "$OS" == "linux" ]]; then
   fi
 fi
 
-# ── 3. fzf ────────────────────────────────────────────────────────────────────
-
-echo ""
-info "==> fzf (fuzzy finder)"
-
-if [[ "$OS" == "macos" ]]; then
-  if has fzf; then
-    ok "fzf already installed"
-  else
-    install_brew fzf
-  fi
-elif [[ "$OS" == "linux" ]]; then
-  if has fzf; then
-    ok "fzf already installed"
-  else
-    install_apt fzf
-  fi
-fi
-
 # ── 4. prettier ───────────────────────────────────────────────────────────────
 
 echo ""
@@ -252,7 +233,7 @@ fi
 # ── 9. chafa ──────────────────────────────────────────────────────────────────
 
 echo ""
-info "==> chafa (image preview in fzf-lua — works in any terminal)"
+info "==> chafa (image fallback for image.nvim on WSL)"
 
 if has chafa; then
   ok "chafa already installed"
@@ -354,7 +335,6 @@ check_tool() {
 
 check_tool git
 check_tool fd fdfind
-check_tool fzf
 check_tool rg
 check_tool prettier
 check_tool lazygit
