@@ -161,7 +161,7 @@ Prompts go to the worktree that has the PR branch checked out, and you are asked
 | `]f` / `[f` | Next / prev file |
 | `-` | Stage/unstage file |
 | `<leader>hs` / `<leader>hu` / `<leader>hr` | Stage / unstage / discard hunk |
-| `t` | Toggle side-by-side / inline |
+| `t` | Toggle inline (default) / side-by-side |
 | `gc` | Toggle compact mode (fold unchanged code) |
 | `<leader>b` / `<leader>e` | Toggle / focus file list |
 | `g?` | Show all diff keymaps |

@@ -98,7 +98,7 @@ return {
     cmd = "CodeDiff",
     opts = {
       diff = {
-        layout = "side-by-side",
+        layout = "inline",
         compute_moves = true,
       },
       explorer = {
