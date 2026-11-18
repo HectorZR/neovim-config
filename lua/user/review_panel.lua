@@ -194,6 +194,16 @@ local function select_row(buf)
   end
 end
 
+--- Move between the two windows of the bottom row.
+---@param target "explorer"|"commits"
+local function focus_panel(target)
+  local explorer, panel = find_windows(vim.api.nvim_get_current_tabpage())
+  local win = target == "explorer" and explorer or panel
+  if win then
+    vim.api.nvim_set_current_win(win)
+  end
+end
+
 local function open_panel(explorer)
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = "wipe"
@@ -222,6 +232,12 @@ local function open_panel(explorer)
     refresh(buf, vim.fn.getcwd())
   end, "Refresh commits")
   map("q", "<cmd>tabclose<cr>", "Close review")
+  map("h", function()
+    focus_panel("explorer")
+  end, "Go to file list")
+  vim.keymap.set("n", "l", function()
+    focus_panel("commits")
+  end, { buffer = vim.api.nvim_win_get_buf(explorer), nowait = true, desc = "Go to commits" })
   bases[buf] = base_ref(vim.fn.getcwd())
   refresh(buf, vim.fn.getcwd())
 end

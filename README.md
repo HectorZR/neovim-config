@@ -174,6 +174,7 @@ not, and `Untracked changes` shows only the work not committed yet, including ne
 | `q` | Close the diff tab |
 | `<CR>` (commits) | Show that commit, `Untracked changes` or `All changes` |
 | `R` (commits) | Refresh the commit list |
+| `l` (files) / `h` (commits) | Jump between the file list and the commits |
 
 ---
 
