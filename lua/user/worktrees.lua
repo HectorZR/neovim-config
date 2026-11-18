@@ -58,8 +58,17 @@ function M.status(path)
   return { dirty = #st, ahead = tonumber(ahead), behind = tonumber(behind) }
 end
 
+--- The octo PR review open in a tab, if any.
+local function octo_review(tab)
+  local reviews = package.loaded["octo.reviews"]
+  return reviews and reviews.reviews[tostring(tab)] or nil
+end
+
 --- Diff tabs inherit the cwd of their worktree, so they must not count as its tab.
 local function is_diff_tab(tab)
+  if octo_review(tab) then
+    return true
+  end
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
     local buf = vim.api.nvim_win_get_buf(win)
     if vim.bo[buf].filetype:match("^codediff") or vim.api.nvim_buf_get_name(buf):match("^codediff://") then
@@ -294,7 +303,10 @@ function M.tabline()
   for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
     local nr = vim.api.nvim_tabpage_get_number(tab)
     local label = "diff"
-    if not is_diff_tab(tab) then
+    local review = octo_review(tab)
+    if review then
+      label = "PR #" .. review.pull_request.number
+    elseif not is_diff_tab(tab) then
       local cwd = vim.fn.getcwd(-1, nr)
       local head = branch_of(cwd)
       label = vim.fn.fnamemodify(cwd, ":t") .. (head ~= "" and ("  " .. head) or "")

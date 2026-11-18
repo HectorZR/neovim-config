@@ -71,6 +71,20 @@ return {
       },
       { "<leader>aq", review("ask"), mode = { "n", "x" }, desc = "Ask Claude about line/selection" },
       {
+        "<leader>at",
+        function()
+          require("user.octo_inline").send_at_cursor()
+        end,
+        desc = "Send PR thread on this line to Claude",
+      },
+      {
+        "<leader>aT",
+        function()
+          require("user.octo_inline").pick()
+        end,
+        desc = "Choose PR threads to send to Claude",
+      },
+      {
         "<leader>aa",
         function()
           require("user.herdr").focus_agent(vim.fn.getcwd())
@@ -114,7 +128,7 @@ return {
       { "<leader>rh", "<cmd>CodeDiff history<cr>", desc = "Review commit history" },
       { "<leader>rH", "<cmd>CodeDiff history %<cr>", desc = "Review file history" },
       {
-        "<leader>rp",
+        "<leader>rP",
         function()
           vim.ui.input({ prompt = "PR number: " }, function(n)
             if n and n:match("^%d+$") then
@@ -122,7 +136,7 @@ return {
             end
           end)
         end,
-        desc = "Review pull request",
+        desc = "Diff pull request (codediff)",
       },
     },
   },
@@ -139,11 +153,15 @@ return {
         { "<leader>rd", icon = review },
         { "<leader>rl", icon = review },
         { "<leader>rH", icon = review },
+        { "<leader>rp", icon = review },
+        { "<leader>rP", icon = review },
         { "<leader>a", group = "agent (claude)", icon = agent },
         { "<leader>aa", icon = agent },
         { "<leader>as", icon = agent },
         { "<leader>aS", icon = agent },
         { "<leader>aq", icon = agent, mode = { "n", "x" } },
+        { "<leader>at", icon = agent },
+        { "<leader>aT", icon = agent },
       })
     end,
   },

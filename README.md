@@ -115,6 +115,8 @@ workspace running Claude. If a prompt can't be delivered, it is kept in the clip
 | `<leader>as` | Send pending review comments to Claude (stays in nvim) |
 | `<leader>aS` | Re-send all open review comments |
 | `<leader>aq` | Ask Claude about the line/selection (n, x) |
+| `<leader>at` | Send the PR thread on this line (Octo review) |
+| `<leader>aT` | Choose PR threads to send: `<Tab>` selects, `<CR>` sends (Octo review) |
 
 ---
 
@@ -127,13 +129,27 @@ workspace running Claude. If a prompt can't be delivered, it is kept in the clip
 | `<leader>rs` | Review staged changes |
 | `<leader>rh` | Commit history |
 | `<leader>rH` | History of current file |
-| `<leader>rp` | Review a pull request by number |
+| `<leader>rP` | Diff a pull request in codediff |
 | `<leader>rc` | Add review comment on line/selection (n, x) |
 | `<leader>rd` | Delete review comment on this line |
 | `<leader>rl` | List comments (`<C-r>` resolve, `<C-x>` delete) |
 
 Comments are stored outside the repo in `stdpath("cache")/review/<repo>/<worktree>/` and are deleted after
 14 days without changes.
+
+### Comments from other reviewers (octo.nvim)
+
+| Key | Action |
+|-----|--------|
+| `<leader>rp` | Open a PR review by number (empty: PR of the current branch) |
+| `<leader>as` | Send open threads not sent yet to Claude |
+| `<leader>aS` | Send every open thread again |
+| `<leader>at` / `<leader>aT` | Send this line's thread / choose threads |
+| `<leader>aq` | Ask Claude about the selected diff lines |
+
+Comments appear inline under their line, and a thread counts as new again when someone replies. The review opens
+read-only (`:Octo review browse`), so nothing is published; run `:Octo review start` to write your own review.
+Prompts go to the worktree that has the PR branch checked out, and you are asked first if there is none.
 
 ### Inside the diff view (codediff.nvim)
 

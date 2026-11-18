@@ -3,11 +3,14 @@
 --   stdpath("cache")/review/<repo>-<hash>/<worktree>/comments.json
 -- Files untouched for `retention_days` are deleted on startup.
 -- Comments are shown as virtual lines and follow edits via extmarks.
+local align = require("user.diff_align")
+
 local M = {}
 
 M.retention_days = 14
 M.root = vim.fn.stdpath("cache") .. "/review"
 local ns = vim.api.nvim_create_namespace("user_review")
+local pad_ns = vim.api.nvim_create_namespace("user_review_pad")
 
 ---@class ReviewComment
 ---@field id integer
@@ -130,6 +133,29 @@ function M.sync(buf)
   end
 end
 
+--- In a codediff tab, the window showing the other side of `buf`.
+local function diff_peer(buf)
+  local tab = vim.api.nvim_get_current_tabpage()
+  local win, others, is_diff = nil, {}, false
+  for _, w in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+    local b = vim.api.nvim_win_get_buf(w)
+    local ft = vim.bo[b].filetype
+    if ft:match("^codediff") or vim.api.nvim_buf_get_name(b):match("^codediff://") then
+      is_diff = true
+    end
+    if vim.api.nvim_win_get_config(w).relative == "" and not ft:match("^codediff") then
+      if b == buf then
+        win = w
+      else
+        table.insert(others, w)
+      end
+    end
+  end
+  if is_diff and win and #others == 1 then
+    return win, others[1]
+  end
+end
+
 function M.render(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   local wt, rel = buf_context(buf)
@@ -138,6 +164,11 @@ function M.render(buf)
   end
   vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
   marks[buf] = {}
+  local win, peer = diff_peer(buf)
+  if peer then
+    vim.api.nvim_buf_clear_namespace(vim.api.nvim_win_get_buf(peer), pad_ns, 0, -1)
+  end
+  local pads = {}
   local count = vim.api.nvim_buf_line_count(buf)
   for _, c in ipairs(M.load(wt)) do
     if c.file == rel and not c.resolved then
@@ -150,15 +181,26 @@ function M.render(buf)
           { i == 1 and status or "", "Comment" },
         })
       end
+      if peer then
+        -- worked out before this comment is drawn, while both sides are still in step
+        table.insert(pads, align.pad(pad_ns, win, e + 1, peer, #virt))
+      end
       -- range mark: gutter sign on the first line; tracked to keep line numbers in sync
       local id = vim.api.nvim_buf_set_extmark(buf, ns, s, 0, {
         end_row = e,
         sign_text = "󰆉",
         sign_hl_group = "DiagnosticInfo",
       })
-      -- the comment text renders below the last commented line
-      vim.api.nvim_buf_set_extmark(buf, ns, e, 0, { virt_lines = virt })
       marks[buf][id] = c.id
+      table.insert(pads, { text = virt, row = e })
+    end
+  end
+  -- all positions are known: now draw the comments and their padding
+  for _, p in ipairs(pads) do
+    if p.text then
+      vim.api.nvim_buf_set_extmark(buf, ns, p.row, 0, { virt_lines = p.text })
+    else
+      align.apply(p)
     end
   end
 end
@@ -263,6 +305,10 @@ end
 --- Send all pending (unsent, unresolved) comments of the current worktree to its agent.
 function M.send(opts)
   opts = opts or {}
+  local octo = package.loaded["user.octo_inline"]
+  if octo and octo.active() then
+    return octo.send(opts)
+  end
   local wt = M.worktree(vim.fn.expand("%:p") ~= "" and vim.fn.expand("%:p") or vim.fn.getcwd())
   if not wt then
     return vim.notify("Not inside a git worktree", vim.log.levels.WARN)
@@ -298,6 +344,10 @@ end
 
 --- Ask the agent about the current selection/line right away (no stored comment).
 function M.ask(line1, line2)
+  local octo = package.loaded["user.octo_inline"]
+  if octo and octo.active() then
+    return octo.ask(line1, line2)
+  end
   local buf = vim.api.nvim_get_current_buf()
   local wt, rel = buf_context(buf)
   if not wt then
@@ -405,6 +455,18 @@ function M.setup()
       if marks[ev.buf] and next(marks[ev.buf]) then
         M.sync(ev.buf)
       end
+    end,
+  })
+  -- codediff fills its windows asynchronously: align once the content is there
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = { "CodeDiffOpen", "CodeDiffFileSelect", "CodeDiffVirtualFileLoaded" },
+    callback = function()
+      vim.defer_fn(function()
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          M.render(vim.api.nvim_win_get_buf(win))
+        end
+      end, 150)
     end,
   })
   vim.defer_fn(M.cleanup, 2000)

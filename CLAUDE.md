@@ -18,6 +18,8 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/user/worktrees.lua` — one tab per git worktree, snacks picker panel, tabline
 - `lua/user/review.lua` — line review comments, stored in `stdpath("cache")/review`, 14-day retention
 - `lua/user/herdr.lua` — herdr CLI bridge: one workspace running Claude per worktree
+- `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
+- `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
 
 ## Plugin Customization Pattern
 
@@ -57,7 +59,7 @@ stylua lua/
 
 - **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
 - **Picker**: `snacks.picker` only
-- **Review**: `codediff.nvim` under `<leader>r`, plus review comments
+- **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
 - **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
 - **Writing**: `render-markdown.nvim`, Spanish + English spelling, `ltex_plus` grammar checks
 - **Dashboard**: custom ASCII header via `snacks.nvim`
