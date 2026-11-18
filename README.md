@@ -106,8 +106,9 @@ Run `:WhichKey <leader>` to interactively browse all leader bindings.
 
 ### Claude Code via herdr (`<leader>a`)
 
-Needs nvim running inside [herdr](https://github.com/ogulcancelik/herdr). Each worktree gets its own herdr
-workspace running Claude. If a prompt can't be delivered, it is kept in the clipboard and in register `r`.
+Needs nvim running inside [herdr](https://github.com/ogulcancelik/herdr). Each worktree gets a Claude tab in nvim's
+herdr workspace, so the diff keeps the full width. Go back to nvim with `Ctrl-b` plus its tab number (usually `Ctrl-b 1`).
+If a prompt can't be delivered, it is kept in the clipboard and in register `r`.
 
 | Key | Action |
 |-----|--------|

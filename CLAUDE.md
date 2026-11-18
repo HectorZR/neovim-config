@@ -16,7 +16,7 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/plugins/` — each file returns a plugin spec table; auto-imported by lazy.nvim
 - `lua/user/worktrees.lua` — one tab per git worktree, snacks picker panel, tabline
 - `lua/user/review.lua` — line review comments, stored in `stdpath("cache")/review`, 14-day retention
-- `lua/user/herdr.lua` — herdr CLI bridge: one workspace running Claude per worktree
+- `lua/user/herdr.lua` — herdr CLI bridge: one Claude tab per worktree in nvim's workspace
 - `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
 - `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
 

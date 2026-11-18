@@ -1,5 +1,5 @@
 -- Bridge to herdr (terminal multiplexer for coding agents) through its CLI.
--- Each git worktree gets its own herdr workspace running Claude Code, named after the worktree.
+-- Each git worktree gets a tab running Claude Code in nvim's herdr workspace, named after the worktree.
 -- Only works when nvim itself runs inside herdr (HERDR_ENV=1); otherwise text goes to the clipboard.
 local M = {}
 
@@ -104,25 +104,35 @@ function M.states(paths)
   return ret
 end
 
---- Create a herdr workspace for the worktree and start Claude in it. cb(agent_name) when ready.
+--- The tab left behind when this worktree's Claude exited, so it can be reused.
+---@return string? pane_id
+---@return string? tab_id
+local function leftover_tab(path, name)
+  local workspace = vim.env.HERDR_WORKSPACE_ID
+  if not workspace then
+    return
+  end
+  local tabs = run({ "tab", "list", "--workspace", workspace })
+  local panes = run({ "pane", "list", "--workspace", workspace })
+  for _, tab in ipairs(tabs and tabs.tabs or {}) do
+    if tab.label == name and tab.pane_count == 1 and tab.tab_id ~= vim.env.HERDR_TAB_ID then
+      for _, pane in ipairs(panes and panes.panes or {}) do
+        if pane.tab_id == tab.tab_id and toplevel(pane.cwd or path) == path then
+          return pane.pane_id, tab.tab_id
+        end
+      end
+    end
+  end
+end
+
+--- Start Claude in a tab of nvim's workspace (one per worktree). cb(agent_name) when ready.
 function M.start_agent(path, opts, cb)
   opts = opts or {}
   path = toplevel(path) or path
   local name = M.agent_name(path, M.agents())
-  run_async({
-    "workspace",
-    "create",
-    "--cwd",
-    path,
-    "--label",
-    name,
-    opts.focus and "--focus" or "--no-focus",
-  }, function(res, err)
-    if not res then
-      return vim.notify("herdr: " .. tostring(err), vim.log.levels.ERROR)
-    end
-    local pane = res.root_pane.pane_id
-    vim.notify(("Starting %s in herdr workspace %s…"):format(M.agent_kind, name), vim.log.levels.INFO)
+
+  local function launch(pane)
+    vim.notify(("Starting %s in herdr tab %s…"):format(M.agent_kind, name), vim.log.levels.INFO)
     run_async({ "agent", "start", name, "--kind", M.agent_kind, "--pane", pane, "--timeout", "60000" }, function(_, e)
       if e and not e:match("^agent_not_ready") then
         return vim.notify("herdr: " .. e, vim.log.levels.ERROR)
@@ -135,6 +145,25 @@ function M.start_agent(path, opts, cb)
         cb(name, e == nil)
       end
     end)
+  end
+
+  local pane, tab = leftover_tab(path, name)
+  if pane then
+    if opts.focus then
+      run({ "tab", "focus", tab })
+    end
+    return launch(pane)
+  end
+
+  local args = { "tab", "create", "--cwd", path, "--label", name, opts.focus and "--focus" or "--no-focus" }
+  if vim.env.HERDR_WORKSPACE_ID then
+    vim.list_extend(args, { "--workspace", vim.env.HERDR_WORKSPACE_ID })
+  end
+  run_async(args, function(res, err)
+    if not res then
+      return vim.notify("herdr: " .. tostring(err), vim.log.levels.ERROR)
+    end
+    launch(res.root_pane.pane_id)
   end)
 end
 
