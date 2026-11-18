@@ -635,6 +635,106 @@ function M.tabline()
   return table.concat(s) .. "%#TabLineFill#"
 end
 
+-- PR of the branch checked out in each working directory, for the statusline
+local branch_prs = {}
+local PR_REFRESH_MS = 60 * 1000
+
+--- Icon name, label and highlight describing a PR, the most urgent state first.
+--- Merged and draft use theme colors: the snacks ones are too dark on the statusline.
+local function pr_summary(pr)
+  if pr.state == "MERGED" then
+    return "merged", "Merged", "Keyword"
+  elseif pr.state == "CLOSED" then
+    return "closed", "Closed", "SnacksGhPrClosed"
+  elseif pr.isDraft then
+    return "draft", "Draft", "Comment"
+  end
+  local checks = checks_state(pr)
+  local label = checks == "failure" and "Checks failed"
+    or pr.reviewDecision == "CHANGES_REQUESTED" and "Changes requested"
+    or pr.details.mergeable == "CONFLICTING" and "Conflicts"
+    or checks == "pending" and "Checks running"
+    or pr.reviewDecision == "APPROVED" and "Approved"
+    or "Open"
+  return "open", label, pr_highlight(pr)
+end
+
+local function redraw_statusline()
+  local ok, lualine = pcall(require, "lualine")
+  if ok then
+    lualine.refresh({ place = { "statusline" } })
+  end
+end
+
+local function fetch_branch_pr(cwd, entry)
+  local fields = "number,state,isDraft,isCrossRepository,headRefName,headRefOid,reviewDecision,"
+    .. "mergeable,statusCheckRollup"
+  local detached = entry.ref == "HEAD"
+  local wt = { branch = entry.ref, head = entry.sha:sub(1, 7), detached = detached }
+  local args = { "pr", "list", "--state", "all", "--limit", "20", "--json", fields }
+  vim.list_extend(args, detached and { "--search", entry.sha } or { "--head", entry.ref })
+  entry.loading = true
+  gh_json(args, cwd, function(prs)
+    entry.loading, entry.checked = false, vim.uv.now()
+    if not prs or branch_prs[cwd] ~= entry then
+      return
+    end
+    local open = vim.tbl_filter(function(pr)
+      return pr.state == "OPEN"
+    end, prs)
+    local pr = find_pr(open, wt) or find_pr(prs, wt)
+    if pr then
+      pr.details = { mergeable = pr.mergeable, statusCheckRollup = pr.statusCheckRollup }
+    end
+    entry.pr = pr
+    redraw_statusline()
+  end)
+end
+
+--- Update the PR of the current directory in the background. Never blocks the editor.
+local function refresh_branch_pr()
+  local cwd = vim.fn.getcwd()
+  vim.system({ "git", "-C", cwd, "rev-parse", "HEAD", "--abbrev-ref", "HEAD" }, { text = true }, function(res)
+    vim.schedule(function()
+      local sha, ref = (res.stdout or ""):match("^(%x+)\n(%S+)")
+      if res.code ~= 0 or not ref then
+        branch_prs[cwd] = nil
+        return redraw_statusline()
+      end
+      local entry = branch_prs[cwd]
+      local moved = entry and entry.sha ~= sha
+      if not entry or entry.ref ~= ref or (ref == "HEAD" and moved) then
+        entry = { ref = ref, sha = sha }
+        branch_prs[cwd] = entry
+        redraw_statusline()
+      end
+      entry.sha = sha
+      local fresh = entry.checked and vim.uv.now() - entry.checked < PR_REFRESH_MS
+      if not entry.loading and (moved or not fresh) then
+        fetch_branch_pr(cwd, entry)
+      end
+    end)
+  end)
+end
+
+--- Statusline text for the PR of the current branch, "" when there is none.
+function M.pr_status()
+  local entry = branch_prs[vim.fn.getcwd()]
+  if not (entry and entry.pr) then
+    return ""
+  end
+  local icon, label = pr_summary(entry.pr)
+  return ("%s #%d %s"):format(vim.trim(require("snacks.gh").config().icons.pr[icon]), entry.pr.number, label)
+end
+
+function M.pr_status_color()
+  local entry = branch_prs[vim.fn.getcwd()]
+  if entry and entry.pr then
+    local _, _, hl = pr_summary(entry.pr)
+    return { fg = Snacks.util.color(hl) }
+  end
+end
+
 function M.setup()
   vim.o.tabline = "%!v:lua.require('user.worktrees').tabline()"
   vim.api.nvim_create_autocmd({ "DirChanged", "FocusGained", "TermClose" }, {
@@ -642,6 +742,22 @@ function M.setup()
     callback = function()
       branches = {}
       vim.cmd.redrawtabline()
+    end,
+  })
+
+  local group = vim.api.nvim_create_augroup("user_worktrees_pr", { clear = true })
+  vim.api.nvim_create_autocmd({ "DirChanged", "TabEnter", "FocusGained" }, {
+    group = group,
+    callback = refresh_branch_pr,
+  })
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = "VeryLazy",
+    once = true,
+    callback = function()
+      refresh_branch_pr()
+      local timer = assert(vim.uv.new_timer())
+      timer:start(2 * PR_REFRESH_MS, 2 * PR_REFRESH_MS, vim.schedule_wrap(refresh_branch_pr))
     end,
   })
 end
