@@ -51,13 +51,37 @@ return {
     opts.dashboard = opts.dashboard or {}
     opts.dashboard.enabled = true
     opts.dashboard.preset = opts.dashboard.preset or {}
-    opts.dashboard.preset.header = [[
-  ██╗   ██╗███████╗
-  ██║   ██║╚══███╔╝
-████████║  ███╔╝
-██╔═══██║ ███╔╝
-  ██║   ██║███████╗
-  ╚═╝   ╚═╝╚══════╝
-]]
+    -- the dashboard ignores trailing spaces when centering: blank braille cells keep the logo aligned
+    opts.dashboard.preset.header = ([[
+██╗  ██╗███████╗
+██║  ██║╚══███╔╝
+███████║  ███╔╝ 
+██╔══██║ ███╔╝  
+██║  ██║███████╗
+╚═╝  ╚═╝╚══════╝
+]]):gsub(" +\n", function(spaces)
+      return ("\u{2800}"):rep(#spaces - 1) .. "\n"
+    end)
+    -- review shortcuts, right after the file ones
+    local keys = opts.dashboard.preset.keys or {}
+    local position = #keys + 1
+    for i, item in ipairs(keys) do
+      if item.key == "r" then
+        position = i + 1
+      end
+    end
+    table.insert(keys, position, {
+      icon = "\u{f126} ",
+      key = "w",
+      desc = "Worktrees",
+      action = ":lua require('user.worktrees').pick()",
+    })
+    table.insert(keys, position + 1, {
+      icon = "\u{f407} ",
+      key = "P",
+      desc = "Pull Requests",
+      action = ":lua Snacks.picker.gh_pr()",
+    })
+    opts.dashboard.preset.keys = keys
   end,
 }
