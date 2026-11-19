@@ -16,6 +16,9 @@ vim.o.statuscolumn = "%!v:lua.require'user.statuscolumn'.get()"
 vim.o.showcmd = false
 vim.g.trouble_lualine = false
 
+-- remember the picked colorscheme and keep the chosen light or dark mode (see user.colorscheme)
+require("user.colorscheme").setup()
+
 -- soft diff colors that follow the active colorscheme (see user.theme)
 require("user.theme").setup()
 

@@ -29,7 +29,10 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin-frappe",
+      -- the last one you picked with <leader>uC, catppuccin-frappe the first time (see user.colorscheme)
+      colorscheme = function()
+        require("user.colorscheme").load()
+      end,
     },
   },
 }

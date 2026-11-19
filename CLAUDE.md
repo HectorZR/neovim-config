@@ -20,6 +20,7 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/user/review_panel.lua` — commits panel next to the codediff file list
 - `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
 - `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
+- `lua/user/colorscheme.lua` — remembers the picked colorscheme and the chosen light or dark mode
 - `lua/user/theme.lua` — diff colors derived from the active colorscheme
 - `lua/user/statuscolumn.lua` — absolute and relative line numbers side by side
 - `lua/user/focus.lua` — line numbers and current line only in the active window
@@ -61,7 +62,7 @@ stylua lua/
 
 ## Key Customizations
 
-- **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
+- **Colorscheme**: the last one picked with `<leader>uC`, `catppuccin-frappe` by default
 - **Picker**: `snacks.picker` only
 - **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
 - **Agent**: Claude Code through herdr under `<leader>a`
