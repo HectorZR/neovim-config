@@ -79,6 +79,7 @@ macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps
 
 Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xcode Command Line Tools on macOS).
 
-## lazy-lock.json
+## Per-environment files
 
-This file pins exact plugin commit SHAs. Update it by running `:Lazy update` inside Neovim. Commit it to reproduce a known-good plugin state.
+`lazy-lock.json` and `lazyvim.json` are gitignored on purpose: each environment keeps its own plugin versions and
+enables only the LazyVim extras (languages, tools) it needs, through `:LazyExtras`.
