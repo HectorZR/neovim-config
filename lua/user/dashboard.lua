@@ -48,7 +48,7 @@ local function rows()
   end
   local branch = here and here.branch ~= "" and here.branch or git({ "branch", "--show-current" }, cwd)
   if not branch or branch == "" then
-    branch = "detached (" .. (git({ "rev-parse", "--short", "HEAD" }, cwd) or "?") .. ")"
+    branch = "(detached " .. (git({ "rev-parse", "--short", "HEAD" }, cwd) or "?") .. ")"
   end
   return {
     { "\u{f401}", "repo", vim.fn.fnamemodify(worktrees[1].path, ":t"), "String" },
