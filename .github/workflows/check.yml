@@ -1,0 +1,36 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install StyLua
+        run: |
+          curl -fsSL -o stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/download/v2.6.0/stylua-linux-x86_64.zip
+          unzip -q stylua.zip -d "$RUNNER_TEMP/stylua"
+          echo "$RUNNER_TEMP/stylua" >> "$GITHUB_PATH"
+      - run: stylua --check lua/ .github/scripts/
+
+  startup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Neovim
+        run: |
+          curl -fsSL https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-linux-x86_64.tar.gz | tar xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+      - name: Use this repository as the config
+        run: |
+          mkdir -p "$RUNNER_TEMP/config"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/config/nvim"
+          echo "XDG_CONFIG_HOME=$RUNNER_TEMP/config" >> "$GITHUB_ENV"
+      # lazy-lock.json is per environment, so this tests the latest version of every plugin
+      - name: Install plugins
+        run: nvim --headless "+Lazy! sync" +qa
+      - name: Start without errors
+        run: nvim --headless -c "luafile .github/scripts/check-startup.lua"

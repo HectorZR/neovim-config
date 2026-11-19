@@ -80,6 +80,12 @@ macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps
 
 Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xcode Command Line Tools on macOS).
 
+## CI
+
+`.github/workflows/check.yml` runs on every push: StyLua must pass, and a clean Neovim 0.12 with the latest plugins
+must start without errors (`.github/scripts/check-startup.lua`). Run that check locally with
+`nvim --headless -c "luafile .github/scripts/check-startup.lua"`.
+
 ## Per-environment files
 
 `lazy-lock.json` and `lazyvim.json` are gitignored on purpose: each environment keeps its own plugin versions and
