@@ -49,6 +49,29 @@ local function rows()
   }
 end
 
+--- Row with the plugin updates waiting, if any: the statusline no longer shows them.
+local function updates_row()
+  local ok, checker = pcall(require, "lazy.manage.checker")
+  local count = ok and #checker.updated or 0
+  if count > 0 then
+    return { "\u{f487}", "updates", count .. (count == 1 and " plugin" or " plugins"), "DiagnosticWarn" }
+  end
+end
+
+--- Redraw the dashboard once lazy has compared the plugins, which happens after it opens.
+local watching = false
+local function watch_updates()
+  if watching then
+    return
+  end
+  watching = true
+  vim.defer_fn(function()
+    if vim.bo.filetype == "snacks_dashboard" and updates_row() then
+      Snacks.dashboard.update()
+    end
+  end, 500)
+end
+
 local function fit(text, width)
   if vim.fn.strdisplaywidth(text) <= width then
     return text
@@ -63,6 +86,8 @@ end
 --- Section for snacks.dashboard: the panel as centered lines.
 function M.section()
   local data = rows()
+  table.insert(data, updates_row())
+  watch_updates()
   local hello = greeting()
   local info = math.max(MIN_INFO, vim.fn.strdisplaywidth(hello))
   for _, row in ipairs(data) do
