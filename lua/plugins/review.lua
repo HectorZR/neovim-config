@@ -167,6 +167,10 @@ return {
       opts.spec = opts.spec or {}
       vim.list_extend(opts.spec, {
         { "<leader>r", group = "review", icon = review },
+        { "<leader>rr", icon = review },
+        { "<leader>rb", icon = review },
+        { "<leader>rs", icon = review },
+        { "<leader>rh", icon = review },
         { "<leader>rc", icon = review, mode = { "n", "x" } },
         { "<leader>rd", icon = review },
         { "<leader>rl", icon = review },

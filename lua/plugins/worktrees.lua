@@ -30,7 +30,12 @@ return {
     "folke/which-key.nvim",
     opts = function(_, opts)
       opts.spec = opts.spec or {}
-      table.insert(opts.spec, { "<leader>go", icon = { icon = "\u{f09b} ", color = "grey" } })
+      local worktree = { icon = "\u{f126} ", color = "green" }
+      vim.list_extend(opts.spec, {
+        { "<leader>gw", icon = worktree },
+        { "<leader>gW", icon = worktree },
+        { "<leader>go", icon = { icon = "\u{f09b} ", color = "grey" } },
+      })
     end,
   },
 }
