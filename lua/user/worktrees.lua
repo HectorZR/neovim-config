@@ -562,6 +562,27 @@ local function load_details(picker, items, main)
   redraw()
 end
 
+--- Text cut to `width` cells, keeping its start and end: "dependabot/go_m…/v2-2.1.1".
+local function shorten(text, width)
+  if vim.fn.strdisplaywidth(text) <= width then
+    return text
+  end
+  if width < 2 then
+    return ""
+  end
+  local tail = math.floor((width - 1) / 2)
+  local head = width - 1 - tail
+  return vim.fn.strcharpart(text, 0, head) .. "…" .. vim.fn.strcharpart(text, vim.fn.strchars(text) - tail)
+end
+
+--- Text cut from the start to `width` cells, where its end tells it apart: "…/help-typo".
+local function shorten_start(text, width)
+  if vim.fn.strdisplaywidth(text) <= width then
+    return text
+  end
+  return width < 2 and "" or "…" .. vim.fn.strcharpart(text, vim.fn.strchars(text) - width + 1)
+end
+
 --- Text padded (or cut) to exactly `width` cells.
 local function cell(text, width, hl)
   local size = vim.fn.strdisplaywidth(text)
@@ -609,10 +630,6 @@ function M.pick()
     idle = { "󰝦", "Comment" },
     unknown = { "󰋗", "Comment" },
   }
-  local branch_width = 0
-  for _, item in ipairs(items) do
-    branch_width = math.min(math.max(branch_width, vim.fn.strdisplaywidth(item.label)), 30)
-  end
   local keys = {
     ["<c-n>"] = { "wt_new", mode = { "n", "i" }, desc = "New worktree" },
     ["<c-x>"] = { "wt_remove", mode = { "n", "i" }, desc = "Remove worktree" },
@@ -622,35 +639,88 @@ function M.pick()
     title = "Worktrees",
     items = items,
     preview = render_preview,
-    layout = { preset = "default" },
+    -- start on the worktree you are in, not on the first one
+    on_show = function(picker)
+      for i, item in ipairs(items) do
+        if item.current then
+          picker.list:set_target(i)
+        end
+      end
+    end,
+    -- wider than the default, and with more room for the list than for the preview
+    layout = {
+      layout = {
+        box = "horizontal",
+        width = 0.9,
+        min_width = 120,
+        height = 0.8,
+        {
+          box = "vertical",
+          border = true,
+          title = "{title} {live} {flags}",
+          { win = "input", height = 1, border = "bottom" },
+          { win = "list", border = "none" },
+        },
+        { win = "preview", title = "{preview}", border = true, width = 0.42 },
+      },
+    },
+    -- one row per worktree: who is on it and what it is on the left, then fixed columns on the right
+    -- (changes, commits ahead/behind, PR) so they line up whatever the branch name
     format = function(item)
       local H, config = Snacks.picker.highlight, gh_config()
-      local agent = agent_icons[item.agent] or { " " }
+      local agent = agent_icons[item.agent]
       local st, pr = item.st, item.pr
-      local checks = pr and checks_state(pr)
-      local check_hl = checks and "SnacksGhCheck" .. Snacks.picker.util.title(checks) or nil
-      local pr_icon = pr and vim.trim(config.icons.pr[pr_icon_name(pr)]) or ""
       local ret = {
         { item.current and "● " or (item.open and "○ " or "  "), "Special" },
-        cell(pr_icon, 2, pr and "SnacksGhPr" .. Snacks.picker.util.title(pr_icon_name(pr)) or nil),
-        cell(
-          item.label,
-          branch_width + 1,
-          item.current and "Title" or (item.wt.detached and "SnacksPickerDimmed" or nil)
-        ),
-        { agent[1] .. " ", agent[2] },
-        cell(pr and "#" .. pr.number or "", 8, pr and pr_highlight(pr) or nil),
-        cell(checks and vim.trim(config.icons.checks[checks]) or "", 2, check_hl),
+        { agent and agent[1] .. " " or "  ", agent and agent[2] or nil },
       }
-      -- the badge caps take 2 cells and it ends with a space
-      local changes = st.dirty > 0 and config.icons.file .. st.dirty or nil
-      if changes then
-        H.extend(ret, H.badge(changes, "SnacksGhStatBadge"))
+
+      -- branch and where it lives share the width the columns leave; the location gives way first
+      local name_hl = item.current and "Title" or (item.wt.detached and "SnacksPickerDimmed" or nil)
+      local where = item.wt.detached and item.wt.head or item.where
+      table.insert(ret, {
+        "",
+        resolve = function(width)
+          width = width - 3 -- a space before the columns, and room for the list's own margin
+          local name = shorten(item.label, width)
+          local room = width - vim.fn.strdisplaywidth(name) - 4 -- two spaces before it and two after
+          local place = room >= 6 and shorten_start(where, room) or ""
+          local used = vim.fn.strdisplaywidth(name) + (place ~= "" and 2 + vim.fn.strdisplaywidth(place) or 0)
+          return {
+            { name, name_hl },
+            { place ~= "" and "  " .. place or "", "SnacksPickerDimmed" },
+            { (" "):rep(math.max(width - used, 0) + 1) },
+          }
+        end,
+      })
+
+      -- uncommitted changes (the preview shows them as a badge, which would not keep the columns aligned)
+      local changes = st.dirty > 0 and vim.trim(config.icons.file) .. " " .. st.dirty or ""
+      table.insert(ret, cell(changes, 6, "Changed"))
+
+      -- commits ahead of and behind the upstream
+      local ahead = (st.ahead or 0) > 0 and "↑" .. st.ahead or ""
+      local behind = (st.behind or 0) > 0 and "↓" .. st.behind or ""
+      table.insert(ret, cell(ahead, 4, "SnacksGhAdditions"))
+      table.insert(ret, cell(behind, 4, "SnacksGhDeletions"))
+
+      -- the PR: state icon, number in the color of its status, and the checks
+      if pr then
+        local checks = checks_state(pr)
+        local icon = pr_icon_name(pr)
+        table.insert(ret, { vim.trim(config.icons.pr[icon]) .. " ", "SnacksGhPr" .. Snacks.picker.util.title(icon) })
+        table.insert(ret, cell("#" .. pr.number, 7, pr_highlight(pr)))
+        table.insert(
+          ret,
+          cell(
+            checks and vim.trim(config.icons.checks[checks]) or "",
+            1,
+            checks and "SnacksGhCheck" .. Snacks.picker.util.title(checks) or nil
+          )
+        )
+      else
+        table.insert(ret, cell(item.pr_state == "loading" and "  …" or "", 10, "SnacksPickerDimmed"))
       end
-      table.insert(ret, { (" "):rep(math.max(8 - (changes and vim.fn.strdisplaywidth(changes) + 3 or 0), 0)) })
-      table.insert(ret, cell((st.ahead or 0) > 0 and "↑" .. st.ahead or "", 4, "SnacksGhAdditions"))
-      table.insert(ret, cell((st.behind or 0) > 0 and "↓" .. st.behind or "", 4, "SnacksGhDeletions"))
-      table.insert(ret, { item.where, "SnacksPickerDimmed" })
       return ret
     end,
     confirm = function(picker, item)
