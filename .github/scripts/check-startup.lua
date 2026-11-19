@@ -66,6 +66,10 @@ vim.defer_fn(function()
     table.insert(errors, "dashboard: " .. tostring(err))
   end
   vim.cmd.edit(config .. "/init.lua")
+  -- switch theme to exercise the ColorScheme hooks, then go back so the remembered theme stays yours
+  local previous, background = vim.g.colors_name, vim.o.background
   vim.cmd.colorscheme("tokyonight-moon")
+  vim.o.background = background
+  vim.cmd.colorscheme(previous)
   vim.defer_fn(finish, 2000)
 end, 3000)
