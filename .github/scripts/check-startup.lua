@@ -58,6 +58,13 @@ vim.defer_fn(function()
       table.insert(errors, err)
     end
   end
+  -- the dashboard only renders when it opens, so open it like a plain `nvim` would
+  local ok, err = pcall(function()
+    Snacks.dashboard.open()
+  end)
+  if not ok then
+    table.insert(errors, "dashboard: " .. tostring(err))
+  end
   vim.cmd.edit(config .. "/init.lua")
   vim.cmd.colorscheme("tokyonight-moon")
   vim.defer_fn(finish, 2000)
