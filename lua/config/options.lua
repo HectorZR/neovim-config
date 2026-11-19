@@ -18,5 +18,8 @@ vim.g.trouble_lualine = false
 -- soft diff colors that follow the active colorscheme (see user.theme)
 require("user.theme").setup()
 
+-- only the active window shows line numbers and the current line (see user.focus)
+require("user.focus").setup()
+
 -- one tab per git worktree, labelled with its branch (see user.worktrees)
 require("user.worktrees").setup()
