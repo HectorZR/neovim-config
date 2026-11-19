@@ -3,6 +3,13 @@ local M = {}
 
 M.LOGO_ROWS = 6
 
+-- codediff ships fixed colors for these and keeps whatever is already defined
+local LINKS = {
+  CodeDiffMoveFrom = "Function",
+  CodeDiffMoveTo = "Function",
+  CodeDiffFiller = "NonText",
+}
+
 local function fg_of(groups)
   for _, name in ipairs(groups) do
     local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
@@ -40,6 +47,9 @@ end
 
 function M.apply()
   apply_dashboard()
+  for name, target in pairs(LINKS) do
+    vim.api.nvim_set_hl(0, name, { link = target })
+  end
   local fallback = vim.o.background == "light" and 0xffffff or 0x1e1e2e
   local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg or fallback
   local add = fg_of({ "GitSignsAdd", "diffAdded", "Added" })
