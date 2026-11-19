@@ -6,7 +6,8 @@
 local M = {}
 
 local FILETYPE = "codediff-commits"
-local REFRESH_MS = 5000
+local REFRESH_MS = 5000 -- how often to look for new commits
+local MAX_AGE_S = 60 -- redraw at least this often, so dates like "2 minutes ago" stay right
 local ns = vim.api.nvim_create_namespace("user.review_panel")
 local commits = {} -- buffer -> commits on screen
 local bases = {} -- buffer -> branch the commits are compared with
@@ -281,6 +282,23 @@ function M.setup()
     pattern = { "CodeDiffOpen", "CodeDiffFileSelect" },
     callback = schedule_sync,
   })
+  -- git writes logs/HEAD on every commit, checkout or reset: reading its time costs no process
+  local git_dirs, last = {}, {}
+  local function head_changed(buf, cwd)
+    if git_dirs[cwd] == nil then
+      local out = vim.fn.systemlist({ "git", "-C", cwd, "rev-parse", "--absolute-git-dir" })
+      git_dirs[cwd] = vim.v.shell_error == 0 and out[1] or false
+    end
+    local stat = git_dirs[cwd] and vim.uv.fs_stat(git_dirs[cwd] .. "/logs/HEAD")
+    local stamp = stat and ("%d.%d:%d"):format(stat.mtime.sec, stat.mtime.nsec, stat.size) or nil
+    local now = os.time()
+    local prev = last[buf]
+    if stamp and prev and prev.stamp == stamp and now - prev.time < MAX_AGE_S then
+      return false
+    end
+    last[buf] = { stamp = stamp, time = now }
+    return true
+  end
   local timer = assert(vim.uv.new_timer())
   timer:start(
     REFRESH_MS,
@@ -288,7 +306,10 @@ function M.setup()
     vim.schedule_wrap(function()
       local _, panel = find_windows(vim.api.nvim_get_current_tabpage())
       if panel then
-        refresh(vim.api.nvim_win_get_buf(panel), vim.fn.getcwd())
+        local buf, cwd = vim.api.nvim_win_get_buf(panel), vim.fn.getcwd()
+        if head_changed(buf, cwd) then
+          refresh(buf, cwd)
+        end
       end
     end)
   )
