@@ -177,7 +177,12 @@ Inside herdr, each worktree has its own herdr tab (Claude and nvim). Outside her
 Use herdr to move around: `Ctrl-b h`/`l` between chat and nvim, `Ctrl-b z` to zoom a pane, `Ctrl-b b` for the sidebar.
 Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude/worktrees/`.
 
-![Worktrees panel with the open PR and the git status of the selected worktree](docs/images/worktrees.png)
+![Worktrees panel: one row per worktree with its agent state, changes, sync and PR](docs/images/worktrees.png)
+
+Each row shows, from left to right: `●` the worktree you are in (`○` one open in another tab), the Claude state in
+herdr (working, waiting for you, done), the branch and its folder, uncommitted changes, commits ahead `↑` and
+behind `↓` its upstream, and the PR with the result of its checks. The panel opens on the worktree you are in.
+Below 120 columns the preview moves under the list, and it switches back when the terminal grows again.
 
 | Key | Action |
 |-----|--------|
