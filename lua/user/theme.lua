@@ -111,6 +111,11 @@ function M.apply()
     return -- keep the theme's own diff colors
   end
 
+  local separator = fg_of({ "Comment" })
+  if separator then
+    vim.api.nvim_set_hl(0, "WinSeparator", { fg = blend(separator, bg, 0.3) })
+  end
+
   local groups = {
     DiffAdd = { bg = blend(add, bg, 0.14) },
     DiffDelete = { bg = blend(delete, bg, 0.14) },
