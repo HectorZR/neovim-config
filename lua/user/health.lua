@@ -60,7 +60,6 @@ local tools = {
 local informational = {
   { name = "go", info = "Required by gopls LSP server" },
   { name = "magick", info = "ImageMagick — converts images for snacks.image (macOS)" },
-  { name = "opencode", info = "OpenCode CLI — required by opencode.nvim" },
   { name = "herdr", info = "Agent multiplexer — required by the <leader>a keymaps" },
   { name = "claude", info = "Claude Code CLI — started by herdr for each worktree" },
   { name = "gh", info = "GitHub CLI — PR reviews (octo) and PR status in the worktrees panel" },

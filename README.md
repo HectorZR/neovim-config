@@ -89,22 +89,6 @@ Run `:WhichKey <leader>` to interactively browse all leader bindings.
 
 ## AI Tools
 
-### OpenCode (`<leader>i`)
-
-| Key | Action |
-|-----|--------|
-| `<leader>ia` | Toggle OpenCode panel |
-| `<leader>ii` | Ask (free text) |
-| `<leader>iI` | Ask with current context |
-| `<leader>ib` | Ask about buffer |
-| `<leader>iP` | Send current context as prompt |
-| `<leader>ipe` | Explain |
-| `<leader>ipf` | Fix |
-| `<leader>ipd` | Diagnose |
-| `<leader>ipr` | Review |
-| `<leader>ipt` | Generate tests |
-| `<leader>ipo` | Optimize |
-
 ### Claude Code via herdr (`<leader>a`)
 
 Needs nvim running inside [herdr](https://github.com/ogulcancelik/herdr). Each worktree gets a tab in nvim's herdr

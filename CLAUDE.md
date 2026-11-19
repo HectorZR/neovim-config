@@ -64,7 +64,7 @@ stylua lua/
 - **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
 - **Picker**: `snacks.picker` only
 - **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
-- **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
+- **Agent**: Claude Code through herdr under `<leader>a`
 - **Writing**: `render-markdown.nvim`, Spanish + English spelling, `ltex_plus` grammar checks
 - **Dashboard**: HZ logo and live greeting panel via `snacks.nvim`
 
