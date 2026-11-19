@@ -9,6 +9,18 @@ end
 vim.g.lazyvim_picker = "snacks"
 
 vim.opt.wrap = true
+vim.o.winborder = "rounded"
+vim.o.statuscolumn = "%!v:lua.require'user.statuscolumn'.get()"
+
+-- keep the statusline short: no pending keys, no code location
+vim.o.showcmd = false
+vim.g.trouble_lualine = false
+
+-- soft diff colors that follow the active colorscheme (see user.theme)
+require("user.theme").setup()
+
+-- only the active window shows line numbers and the current line (see user.focus)
+require("user.focus").setup()
 
 -- one tab per git worktree, labelled with its branch (see user.worktrees)
 require("user.worktrees").setup()

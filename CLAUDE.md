@@ -20,6 +20,10 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/user/review_panel.lua` — commits panel next to the codediff file list
 - `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
 - `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
+- `lua/user/theme.lua` — diff colors derived from the active colorscheme
+- `lua/user/statuscolumn.lua` — absolute and relative line numbers side by side
+- `lua/user/focus.lua` — line numbers and current line only in the active window
+- `lua/user/dashboard.lua` — dashboard panel with the HZ logo, a greeting and the current repository
 
 ## Plugin Customization Pattern
 
@@ -62,7 +66,7 @@ stylua lua/
 - **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
 - **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
 - **Writing**: `render-markdown.nvim`, Spanish + English spelling, `ltex_plus` grammar checks
-- **Dashboard**: custom ASCII header via `snacks.nvim`
+- **Dashboard**: HZ logo and live greeting panel via `snacks.nvim`
 
 ## Keymaps
 

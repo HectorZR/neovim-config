@@ -107,6 +107,11 @@ return {
     commit = "eee54e78e6f152a6eb03b090e95f7576c96a5ad9",
     cmd = "CodeDiff",
     opts = {
+      -- defined by user.theme for the active colorscheme
+      highlights = {
+        char_insert = "UserDiffAddText",
+        char_delete = "UserDiffDeleteText",
+      },
       diff = {
         layout = "inline",
         compute_moves = true,
