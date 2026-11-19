@@ -1,5 +1,6 @@
 -- Marks the active window: the others hide their line numbers and current-line highlight.
 -- The numbers take the background color, so the text doesn't shift when the focus moves.
+-- In a review tab the diff keeps its numbers while you move through the side panels.
 local M = {}
 
 local ns = vim.api.nvim_create_namespace("user.focus")
@@ -13,17 +14,23 @@ local function refresh()
   if is_float(current) then
     return -- a popup doesn't change which window you are working in
   end
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    if not is_float(win) then
-      local active = win == current
-      local win_ns = vim.api.nvim_get_hl_ns({ winid = win })
-      -- octo uses its own namespace on its review windows
-      if win_ns <= 0 or win_ns == ns then
-        vim.api.nvim_win_set_hl_ns(win, active and 0 or ns)
-      end
-      if vim.bo[vim.api.nvim_win_get_buf(win)].buftype == "" then
-        vim.wo[win].cursorline = active
-      end
+  local wins = vim.tbl_filter(function(win)
+    return not is_float(win)
+  end, vim.api.nvim_tabpage_list_wins(0))
+  local review = vim.iter(wins):any(function(win)
+    return vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "codediff-explorer"
+  end)
+  for _, win in ipairs(wins) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local active = win == current
+    local panel = vim.bo[buf].filetype:match("^codediff%-") ~= nil
+    local win_ns = vim.api.nvim_get_hl_ns({ winid = win })
+    -- octo uses its own namespace on its review windows
+    if win_ns <= 0 or win_ns == ns then
+      vim.api.nvim_win_set_hl_ns(win, (active or (review and not panel)) and 0 or ns)
+    end
+    if vim.bo[buf].buftype == "" then
+      vim.wo[win].cursorline = active
     end
   end
 end
