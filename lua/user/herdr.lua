@@ -1,9 +1,12 @@
 -- Bridge to herdr (terminal multiplexer for coding agents) through its CLI.
--- Each git worktree gets a tab running Claude Code in nvim's herdr workspace, named after the worktree.
+-- Each git worktree gets a tab in nvim's herdr workspace: Claude Code on the left, nvim on the right.
 -- Only works when nvim itself runs inside herdr (HERDR_ENV=1); otherwise text goes to the clipboard.
 local M = {}
 
 M.agent_kind = "claude"
+
+-- share of the tab width used by the chat
+local CHAT_RATIO = "0.42"
 
 function M.available()
   return vim.env.HERDR_ENV == "1" and vim.fn.executable("herdr") == 1
@@ -44,10 +47,15 @@ local function toplevel(dir)
   return vim.v.shell_error == 0 and out[1] or nil
 end
 
---- Agent names must match [a-z][a-z0-9_-]{0,31} and be unique among live agents.
-function M.agent_name(path, agents)
+--- Valid agent name for a path: [a-z][a-z0-9_-]{0,28}. Also the label of the worktree's tab.
+local function base_name(path)
   local base = vim.fs.basename(path):lower():gsub("[^a-z0-9_-]", "-"):gsub("^[^a-z]+", "")
-  base = (base == "" and "agent" or base):sub(1, 29)
+  return (base == "" and "agent" or base):sub(1, 29)
+end
+
+--- Agent names must be unique among live agents.
+function M.agent_name(path, agents)
+  local base = base_name(path)
   local used = {}
   for _, a in ipairs(agents or {}) do
     used[a.name or ""] = true
@@ -118,67 +126,207 @@ function M.states_async(paths, cb)
   end)
 end
 
---- The tab left behind when this worktree's Claude exited, so it can be reused.
----@return string? pane_id
----@return string? tab_id
-local function leftover_tab(path, name)
+local function notify_error(err)
+  vim.notify("herdr: " .. tostring(err), vim.log.levels.ERROR)
+end
+
+--- New panes must start with the same nvim config as this one.
+local function env_args()
+  return vim.env.NVIM_APPNAME and { "--env", "NVIM_APPNAME=" .. vim.env.NVIM_APPNAME } or {}
+end
+
+local function own_worktree(path)
+  return vim.env.HERDR_PANE_ID and path == toplevel(vim.fn.getcwd())
+end
+
+--- The worktree's tab in this workspace and its panes.
+local function find_tab(path)
   local workspace = vim.env.HERDR_WORKSPACE_ID
   if not workspace then
     return
   end
+  local label = base_name(path)
   local tabs = run({ "tab", "list", "--workspace", workspace })
   local panes = run({ "pane", "list", "--workspace", workspace })
   for _, tab in ipairs(tabs and tabs.tabs or {}) do
-    if tab.label == name and tab.pane_count == 1 and tab.tab_id ~= vim.env.HERDR_TAB_ID then
-      for _, pane in ipairs(panes and panes.panes or {}) do
-        if pane.tab_id == tab.tab_id and toplevel(pane.cwd or path) == path then
-          return pane.pane_id, tab.tab_id
-        end
+    if tab.label == label and tab.tab_id ~= vim.env.HERDR_TAB_ID then
+      local found = vim.tbl_filter(function(pane)
+        return pane.tab_id == tab.tab_id and toplevel(pane.cwd or path) == path
+      end, panes and panes.panes or {})
+      if #found > 0 then
+        return tab, found
       end
     end
   end
 end
 
---- Start Claude in a tab of nvim's workspace (one per worktree). cb(agent_name) when ready.
-function M.start_agent(path, opts, cb)
+--- A pane sitting at its shell prompt, with nothing running in it.
+local function is_idle(pane_id)
+  local res = run({ "pane", "process-info", "--pane", pane_id })
+  local info = res and res.process_info
+  local process = info and info.foreground_processes and info.foreground_processes[1]
+  return process ~= nil and process.pid == info.shell_pid
+end
+
+local function idle_pane(panes)
+  for _, pane in ipairs(panes) do
+    if pane.pane_id ~= vim.env.HERDR_PANE_ID and is_idle(pane.pane_id) then
+      return pane.pane_id
+    end
+  end
+end
+
+local function launch_agent(name, pane, cb)
+  vim.notify(("Starting %s in herdr tab %s…"):format(M.agent_kind, name), vim.log.levels.INFO)
+  run_async({ "agent", "start", name, "--kind", M.agent_kind, "--pane", pane, "--timeout", "60000" }, function(_, e)
+    if e and not e:match("^agent_not_ready") then
+      return notify_error(e)
+    end
+    if e then
+      -- usually the folder-trust dialog on first run in a new worktree
+      vim.notify(name .. " is waiting for your input in herdr (trust dialog?)", vim.log.levels.WARN)
+    end
+    if cb then
+      cb(name, e == nil)
+    end
+  end)
+end
+
+--- Start nvim in a new pane, once its shell has printed the prompt.
+local function launch_editor(pane)
+  run_async({ "pane", "wait-output", pane, "--regex", "\\S", "--source", "visible", "--timeout", "5000" }, function()
+    run_async({ "pane", "run", pane, vim.fn.shellescape(vim.v.progpath) }, function(_, err)
+      if err then
+        notify_error(err)
+      end
+    end)
+  end)
+end
+
+local function split_args(pane, path, focus)
+  local args = { "pane", "split", pane, "--direction", "right", "--ratio", CHAT_RATIO, "--cwd", path }
+  vim.list_extend(args, env_args())
+  table.insert(args, focus and "--focus" or "--no-focus")
+  return args
+end
+
+--- Move the focus from the editor to the chat on its left.
+local function focus_chat(editor)
+  run_async({ "pane", "focus", "--pane", editor, "--direction", "left" }, function() end)
+end
+
+--- Add the editor to the right of the chat pane.
+local function add_editor(chat, path, focus)
+  run_async(split_args(chat, path, focus), function(res, err)
+    if not res then
+      return notify_error(err)
+    end
+    launch_editor(res.pane.pane_id)
+  end)
+end
+
+--- Add a chat to the left of the editor pane.
+local function add_chat(editor, path, name, focus, cb)
+  run_async(split_args(editor, path, false), function(res, err)
+    if not res then
+      return notify_error(err)
+    end
+    local chat = res.pane.pane_id
+    -- swapping moves the focus to the chat
+    run_async({ "pane", "swap", "--source-pane", chat, "--target-pane", editor }, function(_, swap_err)
+      if swap_err then
+        return notify_error(swap_err)
+      end
+      if not focus then
+        run_async({ "pane", "focus", "--pane", chat, "--direction", "right" }, function() end)
+      end
+      launch_agent(name, chat, cb)
+    end)
+  end)
+end
+
+--- Open the worktree's tab, creating chat and editor as needed.
+--- focus: "agent" | "editor" | false (stay here).
+function M.open_worktree(path, opts, cb)
   opts = opts or {}
   path = toplevel(path) or path
-  local name = M.agent_name(path, M.agents())
-
-  local function launch(pane)
-    vim.notify(("Starting %s in herdr tab %s…"):format(M.agent_kind, name), vim.log.levels.INFO)
-    run_async({ "agent", "start", name, "--kind", M.agent_kind, "--pane", pane, "--timeout", "60000" }, function(_, e)
-      if e and not e:match("^agent_not_ready") then
-        return vim.notify("herdr: " .. e, vim.log.levels.ERROR)
+  local focus = opts.focus
+  if own_worktree(path) then
+    return focus == "agent" and M.focus_agent(path) or nil
+  end
+  local agents = M.agents()
+  local agent = M.agent_for(path, agents)
+  local name = M.agent_name(path, agents)
+  local tab, panes = find_tab(path)
+  if not tab then
+    if agent then
+      -- started before this layout existed, somewhere else
+      return focus and M.focus_agent(path) or nil
+    end
+    local args = { "tab", "create", "--cwd", path, "--label", base_name(path) }
+    vim.list_extend(args, env_args())
+    vim.list_extend(args, { focus and "--focus" or "--no-focus" })
+    if vim.env.HERDR_WORKSPACE_ID then
+      vim.list_extend(args, { "--workspace", vim.env.HERDR_WORKSPACE_ID })
+    end
+    return run_async(args, function(res, err)
+      if not res then
+        return notify_error(err)
       end
-      if e then
-        -- usually the folder-trust dialog on first run in a new worktree
-        vim.notify(name .. " is waiting for your input in herdr (trust dialog?)", vim.log.levels.WARN)
-      end
-      if cb then
-        cb(name, e == nil)
-      end
+      local chat = res.root_pane.pane_id
+      add_editor(chat, path, focus == "editor")
+      launch_agent(name, chat, cb)
     end)
   end
 
-  local pane, tab = leftover_tab(path, name)
-  if pane then
-    if opts.focus then
-      run({ "tab", "focus", tab })
-    end
-    return launch(pane)
+  if focus then
+    run({ "tab", "focus", tab.tab_id })
   end
+  if agent then
+    if #panes == 1 then
+      add_editor(panes[1].pane_id, path, focus == "editor")
+    elseif focus == "agent" then
+      M.focus_agent(path)
+    end
+    return cb and cb(agent.name or agent.pane_id, true)
+  end
+  local idle = idle_pane(panes)
+  if idle then
+    if #panes == 1 then
+      add_editor(idle, path, focus == "editor")
+    elseif focus == "agent" then
+      for _, pane in ipairs(panes) do
+        if pane.pane_id ~= idle then
+          focus_chat(pane.pane_id)
+          break
+        end
+      end
+    end
+    return launch_agent(name, idle, cb)
+  end
+  add_chat(panes[1].pane_id, path, name, focus == "agent", cb)
+end
 
-  local args = { "tab", "create", "--cwd", path, "--label", name, opts.focus and "--focus" or "--no-focus" }
-  if vim.env.HERDR_WORKSPACE_ID then
-    vim.list_extend(args, { "--workspace", vim.env.HERDR_WORKSPACE_ID })
+--- Start Claude for the worktree: next to this nvim, or in the worktree's own tab.
+function M.start_agent(path, opts, cb)
+  opts = opts or {}
+  path = toplevel(path) or path
+  if not own_worktree(path) then
+    return M.open_worktree(path, { focus = opts.focus and "agent" or false }, cb)
   end
-  run_async(args, function(res, err)
-    if not res then
-      return vim.notify("herdr: " .. tostring(err), vim.log.levels.ERROR)
+  local name = M.agent_name(path, M.agents())
+  local res = run({ "pane", "list", "--workspace", vim.env.HERDR_WORKSPACE_ID })
+  local panes = vim.tbl_filter(function(pane)
+    return pane.tab_id == vim.env.HERDR_TAB_ID
+  end, res and res.panes or {})
+  local idle = idle_pane(panes)
+  if idle then
+    if opts.focus then
+      focus_chat(vim.env.HERDR_PANE_ID)
     end
-    launch(res.root_pane.pane_id)
-  end)
+    return launch_agent(name, idle, cb)
+  end
+  add_chat(vim.env.HERDR_PANE_ID, path, name, opts.focus, cb)
 end
 
 --- Focus the worktree's agent in herdr, starting one if none exists.
@@ -191,11 +339,34 @@ function M.focus_agent(path)
   if agent then
     run_async({ "agent", "focus", agent.name or agent.pane_id }, function(_, err)
       if err then
-        vim.notify("herdr: " .. err, vim.log.levels.ERROR)
+        notify_error(err)
       end
     end)
   else
     M.start_agent(path, { focus = true })
+  end
+end
+
+--- Give this nvim the whole tab, or bring the chat back.
+function M.toggle_chat()
+  if not (M.available() and vim.env.HERDR_PANE_ID) then
+    return vim.notify("nvim is not running inside herdr", vim.log.levels.WARN)
+  end
+  run_async({ "pane", "zoom", "--pane", vim.env.HERDR_PANE_ID }, function(_, err)
+    if err then
+      notify_error(err)
+    end
+  end)
+end
+
+--- Find the worktree's tab now and return a function that closes it. For use before removing
+--- the worktree, when its path can still be resolved.
+function M.tab_closer(path)
+  local tab = M.available() and find_tab(toplevel(path) or path) or nil
+  return function()
+    if tab then
+      run_async({ "tab", "close", tab.tab_id }, function() end)
+    end
   end
 end
 
