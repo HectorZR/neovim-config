@@ -437,6 +437,66 @@ local function render_preview(ctx)
 end
 
 --- Load status, PRs and agent state in the background, redrawing the panel as they arrive.
+local prefetched = {} -- main worktree -> vim.uv.now() of the last PR refresh
+
+--- Refresh the open PRs of a repo, and the checks of the ones that belong to `worktrees`.
+--- Results land in pr_cache[main]; on_change(ok) runs each time a piece arrives.
+local function fetch_prs(main, worktrees, on_change)
+  prefetched[main] = vim.uv.now()
+  local fields = "number,title,url,headRefName,headRefOid,isDraft,isCrossRepository,reviewDecision"
+  local details = "author,baseRefName,createdAt,updatedAt,labels,changedFiles,additions,deletions,"
+    .. "mergeable,mergeStateStatus,statusCheckRollup"
+  gh_json({ "pr", "list", "--state", "open", "--limit", "200", "--json", fields }, main, function(prs)
+    if not prs then
+      return on_change(false)
+    end
+    -- keep the checks already known, so the colors do not flicker on refresh
+    local known = {}
+    for _, pr in ipairs(pr_cache[main] or {}) do
+      known[pr.number] = pr
+    end
+    for _, pr in ipairs(prs) do
+      local old = known[pr.number]
+      if old and old.headRefOid == pr.headRefOid then
+        pr.details = old.details
+      end
+    end
+    pr_cache[main] = prs
+    on_change(true)
+    -- checks are expensive, so they are only requested for the PRs of these worktrees
+    for _, wt in ipairs(worktrees) do
+      local pr = find_pr(prs, wt)
+      if pr then
+        gh_json({ "pr", "view", tostring(pr.number), "--json", details }, main, function(extra)
+          if extra then
+            extra.queued = is_queued(pr)
+            pr.details = extra
+            on_change(true)
+            fetch_queued(pr, main, function(queued)
+              extra.queued = queued
+              on_change(true)
+            end)
+          end
+        end)
+      end
+    end
+  end)
+end
+
+--- Load the PRs of the current repo in the background, so the panel opens with them.
+--- Skipped when they were refreshed less than `max_age` ms ago.
+local function prefetch_prs(max_age)
+  if vim.fn.executable("gh") == 0 then
+    return
+  end
+  local list = M.list()
+  local main = list and list[1] and list[1].path
+  if not main or (prefetched[main] and vim.uv.now() - prefetched[main] < max_age) then
+    return
+  end
+  fetch_prs(main, list, function() end)
+end
+
 local function load_details(picker, items, main)
   local function redraw()
     if not picker.closed then
@@ -476,47 +536,18 @@ local function load_details(picker, items, main)
   if pr_cache[main] then
     set_prs(pr_cache[main])
   end
-  local fields = "number,title,url,headRefName,headRefOid,isDraft,isCrossRepository,reviewDecision"
-  local details = "author,baseRefName,createdAt,updatedAt,labels,changedFiles,additions,deletions,"
-    .. "mergeable,mergeStateStatus,statusCheckRollup"
-  gh_json({ "pr", "list", "--state", "open", "--limit", "200", "--json", fields }, main, function(prs)
-    if not prs then
+  local worktrees = vim.tbl_map(function(item)
+    return item.wt
+  end, items)
+  fetch_prs(main, worktrees, function(ok)
+    if ok then
+      set_prs(pr_cache[main])
+    else
       for _, item in ipairs(items) do
         item.pr_state = item.pr and "open" or "unavailable"
       end
-      return redraw()
     end
-    -- keep the checks already known, so the colors do not flicker on refresh
-    local known = {}
-    for _, pr in ipairs(pr_cache[main] or {}) do
-      known[pr.number] = pr
-    end
-    for _, pr in ipairs(prs) do
-      local old = known[pr.number]
-      if old and old.headRefOid == pr.headRefOid then
-        pr.details = old.details
-      end
-    end
-    pr_cache[main] = prs
-    set_prs(prs)
     redraw()
-    -- checks are expensive, so they are only requested for the PRs on screen
-    for _, item in ipairs(items) do
-      local pr = item.pr
-      if pr then
-        gh_json({ "pr", "view", tostring(pr.number), "--json", details }, main, function(extra)
-          if extra then
-            extra.queued = is_queued(pr)
-            pr.details = extra
-            redraw()
-            fetch_queued(pr, main, function(queued)
-              extra.queued = queued
-              redraw()
-            end)
-          end
-        end)
-      end
-    end
   end)
 
   local paths = vim.tbl_map(function(item)
@@ -690,6 +721,9 @@ end
 -- PR of the branch checked out in each working directory, for the statusline
 local branch_prs = {}
 local PR_REFRESH_MS = 60 * 1000
+-- worktree panel PRs: reloaded in the background every 5 minutes, or on focus if older than one
+local PANEL_REFRESH_MS = 5 * 60 * 1000
+local PANEL_FRESH_MS = 60 * 1000
 
 --- Icon name, label and highlight describing a PR, the most urgent state first.
 --- Merged and draft use theme colors: the snacks ones are too dark on the statusline.
@@ -809,7 +843,10 @@ function M.setup()
   local group = vim.api.nvim_create_augroup("user_worktrees_pr", { clear = true })
   vim.api.nvim_create_autocmd({ "DirChanged", "TabEnter", "FocusGained" }, {
     group = group,
-    callback = refresh_branch_pr,
+    callback = function()
+      refresh_branch_pr()
+      prefetch_prs(PANEL_FRESH_MS)
+    end,
   })
   vim.api.nvim_create_autocmd("User", {
     group = group,
@@ -817,8 +854,19 @@ function M.setup()
     once = true,
     callback = function()
       refresh_branch_pr()
+      -- a moment after startup, so loading the panel's PRs never competes with opening files
+      vim.defer_fn(function()
+        prefetch_prs(PANEL_FRESH_MS)
+      end, 3000)
       local timer = assert(vim.uv.new_timer())
-      timer:start(2 * PR_REFRESH_MS, 2 * PR_REFRESH_MS, vim.schedule_wrap(refresh_branch_pr))
+      timer:start(
+        2 * PR_REFRESH_MS,
+        2 * PR_REFRESH_MS,
+        vim.schedule_wrap(function()
+          refresh_branch_pr()
+          prefetch_prs(PANEL_REFRESH_MS)
+        end)
+      )
     end,
   })
 end
