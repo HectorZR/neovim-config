@@ -9,6 +9,7 @@ end
 vim.g.lazyvim_picker = "snacks"
 
 vim.opt.wrap = true
+vim.o.winborder = "rounded"
 
 -- soft diff colors that follow the active colorscheme (see user.theme)
 require("user.theme").setup()
