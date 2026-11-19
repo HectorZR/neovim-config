@@ -20,6 +20,7 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/user/review_panel.lua` — commits panel next to the codediff file list
 - `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
 - `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
+- `lua/user/theme.lua` — diff colors derived from the active colorscheme
 
 ## Plugin Customization Pattern
 

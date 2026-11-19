@@ -10,5 +10,8 @@ vim.g.lazyvim_picker = "snacks"
 
 vim.opt.wrap = true
 
+-- soft diff colors that follow the active colorscheme (see user.theme)
+require("user.theme").setup()
+
 -- one tab per git worktree, labelled with its branch (see user.worktrees)
 require("user.worktrees").setup()
