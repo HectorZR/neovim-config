@@ -3,6 +3,8 @@
 Built on [LazyVim](https://lazyvim.github.io/). This file covers custom and frequently-used keymaps.
 For the full LazyVim keymap reference: https://www.lazyvim.org/keymaps
 
+![Dashboard with the HZ logo, a greeting, the current repository and pending plugin updates](docs/images/dashboard.png)
+
 ---
 
 ## Setup
@@ -27,6 +29,8 @@ Inside Neovim:
 `<leader>` = **Space**
 
 Run `:WhichKey <leader>` to interactively browse all leader bindings.
+
+![which-key showing the review group after pressing Space r](docs/images/whichkey.png)
 
 ---
 
@@ -109,6 +113,11 @@ clipboard and in register `r`.
 
 ## Code Review (`<leader>r`)
 
+The diff shows each change inline with its review comments. Below it, the changed files sit next to the branch commits;
+choosing a commit filters the files and the diff to it.
+
+![Inline diff with a review comment, the changed files and the commits of the branch](docs/images/review.png)
+
 | Key | Action |
 |-----|--------|
 | `<leader>rr` | Review working changes (live-updates while the agent works) |
@@ -168,6 +177,8 @@ Inside herdr, each worktree has its own herdr tab (Claude and nvim). Outside her
 Use herdr to move around: `Ctrl-b h`/`l` between chat and nvim, `Ctrl-b z` to zoom a pane, `Ctrl-b b` for the sidebar.
 Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude/worktrees/`.
 
+![Worktrees panel with the open PR and the git status of the selected worktree](docs/images/worktrees.png)
+
 | Key | Action |
 |-----|--------|
 | `<leader>gw` | Open the panel |
@@ -192,6 +203,8 @@ Agent state: `󰒓` working, `󰀨` waiting for you, `󰗠` done, `󰝦` idle, `
 
 Markdown, text and git commit buffers get word wrap, Spanish + English spelling and grammar checks (ltex).
 
+![Rendered markdown with a callout and a table](docs/images/writing.png)
+
 | Key | Action |
 |-----|--------|
 | `<leader>um` | Toggle rendered markdown |
@@ -204,6 +217,11 @@ Markdown, text and git commit buffers get word wrap, Spanish + English spelling 
 ---
 
 ## Editor
+
+Only the active window shows line numbers (absolute and relative) and the current line, and diagnostic messages
+appear on the cursor line; other problems keep their sign in the margin.
+
+![Two windows: the active one with line numbers and a diagnostic on the cursor line, the other without numbers](docs/images/editing.png)
 
 | Key | Action |
 |-----|--------|
