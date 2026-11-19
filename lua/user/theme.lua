@@ -19,6 +19,16 @@ local function fg_of(groups)
   end
 end
 
+--- First background the theme defines: transparent themes have none on Normal.
+local function background()
+  for _, name in ipairs({ "Normal", "NormalFloat", "Pmenu", "StatusLine" }) do
+    local bg = vim.api.nvim_get_hl(0, { name = name, link = false }).bg
+    if bg then
+      return bg
+    end
+  end
+end
+
 --- Mix `color` over `base`; `amount` goes from 0 (only base) to 1 (only color).
 local function blend(color, base, amount)
   local function channel(shift)
@@ -50,13 +60,12 @@ function M.apply()
   for name, target in pairs(LINKS) do
     vim.api.nvim_set_hl(0, name, { link = target })
   end
-  local fallback = vim.o.background == "light" and 0xffffff or 0x1e1e2e
-  local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg or fallback
+  local bg = background()
   local add = fg_of({ "GitSignsAdd", "diffAdded", "Added" })
   local delete = fg_of({ "GitSignsDelete", "diffRemoved", "Removed" })
   local change = fg_of({ "GitSignsChange", "diffChanged", "Changed" })
-  if not (add and delete and change) then
-    return
+  if not (bg and add and delete and change) then
+    return -- keep the theme's own diff colors
   end
 
   local groups = {
