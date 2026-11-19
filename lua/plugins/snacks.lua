@@ -45,6 +45,11 @@ return {
       dev = { "~/dev", "~/projects", "~/Developer" },
     })
 
+    -- guides only for the block under the cursor, in the active window
+    opts.indent = vim.tbl_deep_extend("force", opts.indent or {}, {
+      indent = { only_scope = true, only_current = true },
+    })
+
     opts.image = opts.image or {}
     opts.image.enabled = true
 
