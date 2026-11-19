@@ -582,6 +582,11 @@ function M.pick()
   for _, item in ipairs(items) do
     branch_width = math.min(math.max(branch_width, vim.fn.strdisplaywidth(item.label)), 30)
   end
+  local keys = {
+    ["<c-n>"] = { "wt_new", mode = { "n", "i" }, desc = "New worktree" },
+    ["<c-x>"] = { "wt_remove", mode = { "n", "i" }, desc = "Remove worktree" },
+    ["<c-a>"] = { "wt_agent", mode = { "n", "i" }, desc = "Open/focus Claude (herdr)" },
+  }
   local picker = Snacks.picker.pick({
     title = "Worktrees",
     items = items,
@@ -641,14 +646,10 @@ function M.pick()
         end
       end,
     },
+    -- the same keys in the list, where snacks would otherwise select all or move down
     win = {
-      input = {
-        keys = {
-          ["<c-n>"] = { "wt_new", mode = { "n", "i" }, desc = "New worktree" },
-          ["<c-x>"] = { "wt_remove", mode = { "n", "i" }, desc = "Remove worktree" },
-          ["<c-a>"] = { "wt_agent", mode = { "n", "i" }, desc = "Open/focus Claude (herdr)" },
-        },
-      },
+      input = { keys = keys },
+      list = { keys = keys },
     },
   })
   load_details(picker, items, list[1].path)

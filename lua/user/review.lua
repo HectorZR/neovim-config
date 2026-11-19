@@ -394,6 +394,10 @@ function M.pick()
     M.save(wt, comments)
     render_worktree(wt)
   end
+  local keys = {
+    ["<c-r>"] = { "review_resolve", mode = { "n", "i" }, desc = "Toggle resolved" },
+    ["<c-x>"] = { "review_delete", mode = { "n", "i" }, desc = "Delete comment" },
+  }
   Snacks.picker.pick({
     title = "Review comments",
     items = items,
@@ -430,13 +434,10 @@ function M.pick()
         M.pick()
       end,
     },
+    -- the same keys in the list, so they work wherever the cursor is
     win = {
-      input = {
-        keys = {
-          ["<c-r>"] = { "review_resolve", mode = { "n", "i" }, desc = "Toggle resolved" },
-          ["<c-x>"] = { "review_delete", mode = { "n", "i" }, desc = "Delete comment" },
-        },
-      },
+      input = { keys = keys },
+      list = { keys = keys },
     },
   })
 end
