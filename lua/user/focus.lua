@@ -25,11 +25,12 @@ local function refresh()
     local active = win == current
     local panel = vim.bo[buf].filetype:match("^codediff%-") ~= nil
     local win_ns = vim.api.nvim_get_hl_ns({ winid = win })
-    -- octo uses its own namespace on its review windows
-    if win_ns <= 0 or win_ns == ns then
-      vim.api.nvim_win_set_hl_ns(win, (active or (review and not panel)) and 0 or ns)
+    local wanted = (active or (review and not panel)) and 0 or ns
+    -- octo uses its own namespace on its review windows; skip windows already right, each change redraws them
+    if (win_ns <= 0 or win_ns == ns) and math.max(win_ns, 0) ~= wanted then
+      vim.api.nvim_win_set_hl_ns(win, wanted)
     end
-    if vim.bo[buf].buftype == "" then
+    if vim.bo[buf].buftype == "" and vim.wo[win].cursorline ~= active then
       vim.wo[win].cursorline = active
     end
   end
