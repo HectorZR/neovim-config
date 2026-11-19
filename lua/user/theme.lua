@@ -1,6 +1,8 @@
 -- Colors derived from the active colorscheme, so every theme gets the same soft diff look.
 local M = {}
 
+M.LOGO_ROWS = 6
+
 local function fg_of(groups)
   for _, name in ipairs(groups) do
     local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
@@ -19,7 +21,25 @@ local function blend(color, base, amount)
   return channel(0x10000) + channel(0x100) + channel(1)
 end
 
+--- Dashboard colors: each logo letter fades down its rows, H into the color where Z starts.
+local function apply_dashboard()
+  -- only the color: some themes give FloatBorder a background that would patch the panel
+  vim.api.nvim_set_hl(0, "UserDashboardBorder", { fg = fg_of({ "FloatBorder", "Comment" }) })
+  local first = fg_of({ "Function" })
+  local middle = fg_of({ "Keyword", "Statement" })
+  local last = fg_of({ "Constant" })
+  if not (first and middle and last) then
+    return
+  end
+  for row = 1, M.LOGO_ROWS do
+    local amount = (row - 1) / (M.LOGO_ROWS - 1)
+    vim.api.nvim_set_hl(0, "UserDashboardH" .. row, { fg = blend(middle, first, amount) })
+    vim.api.nvim_set_hl(0, "UserDashboardZ" .. row, { fg = blend(last, middle, amount) })
+  end
+end
+
 function M.apply()
+  apply_dashboard()
   local fallback = vim.o.background == "light" and 0xffffff or 0x1e1e2e
   local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg or fallback
   local add = fg_of({ "GitSignsAdd", "diffAdded", "Added" })
