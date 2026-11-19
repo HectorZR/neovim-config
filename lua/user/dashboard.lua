@@ -38,7 +38,15 @@ local function rows()
   if not worktrees or not worktrees[1] then
     return { { "\u{f07b}", "folder", vim.fn.fnamemodify(cwd, ":~"), "String" } }
   end
-  local branch = git({ "branch", "--show-current" }, cwd)
+  -- the worktree list already has the branch of the worktree we're in, so no extra git call
+  local real = vim.fs.normalize(vim.uv.fs_realpath(cwd) or cwd)
+  local here
+  for _, wt in ipairs(worktrees) do
+    if (real == wt.path or vim.startswith(real, wt.path .. "/")) and (not here or #wt.path > #here.path) then
+      here = wt
+    end
+  end
+  local branch = here and here.branch ~= "" and here.branch or git({ "branch", "--show-current" }, cwd)
   if not branch or branch == "" then
     branch = "detached (" .. (git({ "rev-parse", "--short", "HEAD" }, cwd) or "?") .. ")"
   end
