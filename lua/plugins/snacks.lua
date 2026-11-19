@@ -51,17 +51,13 @@ return {
     opts.dashboard = opts.dashboard or {}
     opts.dashboard.enabled = true
     opts.dashboard.preset = opts.dashboard.preset or {}
-    -- the dashboard ignores trailing spaces when centering: blank braille cells keep the logo aligned
-    opts.dashboard.preset.header = ([[
-██╗  ██╗███████╗
-██║  ██║╚══███╔╝
-███████║  ███╔╝ 
-██╔══██║ ███╔╝  
-██║  ██║███████╗
-╚═╝  ╚═╝╚══════╝
-]]):gsub(" +\n", function(spaces)
-      return ("\u{2800}"):rep(#spaces - 1) .. "\n"
-    end)
+    opts.dashboard.sections = {
+      function()
+        return require("user.dashboard").section()
+      end,
+      { section = "keys", padding = 1 },
+      { section = "startup" },
+    }
     -- review shortcuts, right after the file ones
     local keys = opts.dashboard.preset.keys or {}
     local position = #keys + 1
