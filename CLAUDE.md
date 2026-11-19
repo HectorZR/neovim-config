@@ -74,6 +74,9 @@ stylua lua/
 `README.md` is the keymap cheatsheet. Update it whenever a keymap is added, changed or removed, and give every
 keymap a `desc` so it shows up in which-key.
 
+`.github/scripts/check-keymaps.py` enforces both in CI: run `python3 .github/scripts/check-keymaps.py` after touching a
+keymap.
+
 ## Supported systems
 
 macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps.sh` covers both. Windows and WSL are not supported.
@@ -82,7 +85,7 @@ Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xc
 
 ## CI
 
-`.github/workflows/check.yml` runs on every push: StyLua must pass, and a clean Neovim 0.12 with the latest plugins
+`.github/workflows/check.yml` runs on every push: StyLua and the keymap check must pass, and a clean Neovim 0.12 with the latest plugins
 must start without errors (`.github/scripts/check-startup.lua`). Run that check locally with
 `nvim --headless -c "luafile .github/scripts/check-startup.lua"`.
 

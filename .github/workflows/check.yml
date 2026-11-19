@@ -15,6 +15,8 @@ jobs:
           unzip -q stylua.zip -d "$RUNNER_TEMP/stylua"
           echo "$RUNNER_TEMP/stylua" >> "$GITHUB_PATH"
       - run: stylua --check lua/ .github/scripts/
+      - name: Keymaps have a description and are in the README
+        run: python3 .github/scripts/check-keymaps.py
 
   startup:
     runs-on: ubuntu-latest
