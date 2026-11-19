@@ -13,7 +13,7 @@ local LOGO = {
 local LOGO_WIDTH = 16
 local GAP = "   "
 local MIN_INFO, MAX_INFO = 24, 33 -- the whole panel has to fit the dashboard's 60 columns
-local LABEL_WIDTH = 11
+local LABEL_WIDTH = 13 -- icon and name
 local PADDING = 2
 
 local function greeting()
@@ -31,21 +31,21 @@ local function git(args, cwd)
   return vim.v.shell_error == 0 and out[1] or nil
 end
 
---- Label and value of each row, for the current directory.
+--- Icon, label, value and value color of each row, for the current directory.
 local function rows()
   local cwd = vim.fn.getcwd()
   local worktrees = require("user.worktrees").list(cwd)
   if not worktrees or not worktrees[1] then
-    return { { "folder", vim.fn.fnamemodify(cwd, ":~") } }
+    return { { "\u{f07b}", "folder", vim.fn.fnamemodify(cwd, ":~"), "String" } }
   end
   local branch = git({ "branch", "--show-current" }, cwd)
   if not branch or branch == "" then
     branch = "detached (" .. (git({ "rev-parse", "--short", "HEAD" }, cwd) or "?") .. ")"
   end
   return {
-    { "repo", vim.fn.fnamemodify(worktrees[1].path, ":t") },
-    { "branch", branch },
-    { "worktrees", tostring(#worktrees) },
+    { "\u{f401}", "repo", vim.fn.fnamemodify(worktrees[1].path, ":t"), "String" },
+    { "\u{e725}", "branch", branch, "Keyword" },
+    { "\u{f1bb}", "worktrees", tostring(#worktrees), "Constant" },
   }
 end
 
@@ -66,7 +66,7 @@ function M.section()
   local hello = greeting()
   local info = math.max(MIN_INFO, vim.fn.strdisplaywidth(hello))
   for _, row in ipairs(data) do
-    info = math.max(info, LABEL_WIDTH + vim.fn.strdisplaywidth(row[2]))
+    info = math.max(info, LABEL_WIDTH + vim.fn.strdisplaywidth(row[3]))
   end
   info = math.min(info, MAX_INFO)
   local inner = LOGO_WIDTH + #GAP + info
@@ -85,8 +85,9 @@ function M.section()
   local right = { { { pad(hello, info), hl = "Title" } }, { { (" "):rep(info) } } }
   for _, row in ipairs(data) do
     table.insert(right, {
-      { pad(row[1], LABEL_WIDTH), hl = "Comment" },
-      { pad(fit(row[2], info - LABEL_WIDTH), info - LABEL_WIDTH), hl = "SnacksDashboardSpecial" },
+      { row[1] .. " ", hl = row[4] },
+      { pad(row[2], LABEL_WIDTH - 2), hl = "Comment" },
+      { pad(fit(row[3], info - LABEL_WIDTH), info - LABEL_WIDTH), hl = row[4] },
     })
   end
 
@@ -95,7 +96,11 @@ function M.section()
     {
       align = "center",
       text = {
-        { "╭─ hector@zurga " .. ("─"):rep(width - title_width) .. "╮", hl = "UserDashboardBorder" },
+        { "╭─ ", hl = "UserDashboardBorder" },
+        { "hector", hl = "Function" },
+        { "@", hl = "Comment" },
+        { "zurga", hl = "Keyword" },
+        { " " .. ("─"):rep(width - title_width) .. "╮", hl = "UserDashboardBorder" },
       },
     },
     blank,
