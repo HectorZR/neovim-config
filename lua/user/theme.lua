@@ -3,11 +3,13 @@ local M = {}
 
 M.LOGO_ROWS = 6
 
--- codediff ships fixed colors for these and keeps whatever is already defined
+-- Used when the theme doesn't define them: codediff would otherwise fall back to fixed colors
+-- and which-key loses its link when a colorscheme clears the highlights.
 local LINKS = {
   CodeDiffMoveFrom = "Function",
   CodeDiffMoveTo = "Function",
   CodeDiffFiller = "NonText",
+  WhichKeyBorder = "FloatBorder",
 }
 
 local function fg_of(groups)
@@ -18,6 +20,30 @@ local function fg_of(groups)
     end
   end
 end
+
+-- floating windows share the editor background, so their rounded border is what frames them
+local FLOATS = {
+  "NormalFloat",
+  "FloatBorder",
+  "FloatTitle",
+  "Pmenu",
+  "BlinkCmpMenu",
+  "BlinkCmpMenuBorder",
+  "BlinkCmpDoc",
+  "BlinkCmpDocBorder",
+  "BlinkCmpDocSeparator",
+  "BlinkCmpSignatureHelp",
+  "BlinkCmpSignatureHelpBorder",
+  "WhichKeyNormal",
+  "WhichKeyBorder",
+  "WhichKeyTitle",
+  "NoiceCmdlinePopup",
+  "NoiceCmdlinePopupBorder",
+  "NoicePopup",
+  "NoicePopupBorder",
+  "NoicePopupmenu",
+  "NoicePopupmenuBorder",
+}
 
 --- First background the theme defines: transparent themes have none on Normal.
 local function background()
@@ -38,6 +64,22 @@ local function blend(color, base, amount)
   return channel(0x10000) + channel(0x100) + channel(1)
 end
 
+local function apply_floats()
+  local editor = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  local fallback_border = fg_of({ "Function", "Comment" })
+  for _, name in ipairs(FLOATS) do
+    local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
+    if hl.bg then
+      -- themes with solid floats hide the border by painting it like the background
+      if name:match("Border$") and (not hl.fg or hl.fg == hl.bg) then
+        hl.fg = fallback_border
+      end
+      hl.bg = editor
+      vim.api.nvim_set_hl(0, name, hl)
+    end
+  end
+end
+
 --- Dashboard colors: each logo letter fades down its rows, H into the color where Z starts.
 local function apply_dashboard()
   -- only the color: some themes give FloatBorder a background that would patch the panel
@@ -56,9 +98,10 @@ local function apply_dashboard()
 end
 
 function M.apply()
+  apply_floats()
   apply_dashboard()
   for name, target in pairs(LINKS) do
-    vim.api.nvim_set_hl(0, name, { link = target })
+    vim.api.nvim_set_hl(0, name, { link = target, default = true })
   end
   local bg = background()
   local add = fg_of({ "GitSignsAdd", "diffAdded", "Added" })
