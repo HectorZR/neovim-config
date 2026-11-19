@@ -20,6 +20,7 @@ This is a Neovim 0.12+ configuration built on [LazyVim](https://lazyvim.github.i
 - `lua/user/review_panel.lua` — commits panel next to the codediff file list
 - `lua/user/octo_inline.lua` — inline PR comments in octo reviews and sending them to Claude; wraps octo internals
 - `lua/user/diff_align.lua` — keeps side-by-side diffs aligned when virtual lines are added
+- `lua/user/colorscheme.lua` — remembers the picked colorscheme and the chosen light or dark mode
 - `lua/user/theme.lua` — diff colors derived from the active colorscheme
 - `lua/user/statuscolumn.lua` — absolute and relative line numbers side by side
 - `lua/user/focus.lua` — line numbers and current line only in the active window
@@ -61,10 +62,10 @@ stylua lua/
 
 ## Key Customizations
 
-- **Colorscheme**: `catppuccin-frappe` (set in `plugins/colorscheme.lua`)
+- **Colorscheme**: the last one picked with `<leader>uC`, `catppuccin-frappe` by default
 - **Picker**: `snacks.picker` only
 - **Review**: `codediff.nvim` for local changes and `octo.nvim` for GitHub PR comments, under `<leader>r`
-- **Agent**: Claude Code through herdr under `<leader>a`; OpenCode under `<leader>i`
+- **Agent**: Claude Code through herdr under `<leader>a`
 - **Writing**: `render-markdown.nvim`, Spanish + English spelling, `ltex_plus` grammar checks
 - **Dashboard**: HZ logo and live greeting panel via `snacks.nvim`
 
@@ -79,6 +80,13 @@ macOS is the main system; Debian/Ubuntu Linux is used for testing. `install-deps
 
 Treesitter compiles parsers natively and requires a C compiler (`gcc`, or the Xcode Command Line Tools on macOS).
 
-## lazy-lock.json
+## CI
 
-This file pins exact plugin commit SHAs. Update it by running `:Lazy update` inside Neovim. Commit it to reproduce a known-good plugin state.
+`.github/workflows/check.yml` runs on every push: StyLua must pass, and a clean Neovim 0.12 with the latest plugins
+must start without errors (`.github/scripts/check-startup.lua`). Run that check locally with
+`nvim --headless -c "luafile .github/scripts/check-startup.lua"`.
+
+## Per-environment files
+
+`lazy-lock.json` and `lazyvim.json` are gitignored on purpose: each environment keeps its own plugin versions and
+enables only the LazyVim extras (languages, tools) it needs, through `:LazyExtras`.

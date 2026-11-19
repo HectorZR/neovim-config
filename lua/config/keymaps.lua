@@ -2,11 +2,11 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
-local set_keymap = vim.api.nvim_set_keymap
+local map = vim.keymap.set
 
-set_keymap("n", "<leader>o", "o<ESC>", { silent = true, desc = "Add empty line bellow cursor" })
-set_keymap("n", "<leader>O", "O<ESC>", { silent = true, desc = "Add empty line above cursor" })
-set_keymap("i", "<S-CR>", "<ESC>o", { silent = true, desc = "Add empty line bellow cursor" })
-set_keymap("i", "<C-CR>", "<ESC>O", { silent = true, desc = "Add empty line above cursor" })
+map("n", "<leader>o", "o<Esc>", { desc = "Add empty line below cursor" })
+map("n", "<leader>O", "O<Esc>", { desc = "Add empty line above cursor" })
+map("i", "<S-CR>", "<Esc>o", { desc = "Add empty line below cursor" })
+map("i", "<C-CR>", "<Esc>O", { desc = "Add empty line above cursor" })
 
-set_keymap("n", "<leader>ce", "^ggVG", { silent = true, desc = "Select all content in file" })
+map("n", "<leader>ce", "ggVG", { desc = "Select all content in file" })
