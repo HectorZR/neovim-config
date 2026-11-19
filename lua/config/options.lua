@@ -11,6 +11,10 @@ vim.g.lazyvim_picker = "snacks"
 vim.opt.wrap = true
 vim.o.winborder = "rounded"
 
+-- keep the statusline short: no pending keys, no code location
+vim.o.showcmd = false
+vim.g.trouble_lualine = false
+
 -- soft diff colors that follow the active colorscheme (see user.theme)
 require("user.theme").setup()
 
