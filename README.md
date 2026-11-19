@@ -182,6 +182,7 @@ Any worktree git knows about is listed: sibling folders, `.worktrees/`, `.claude
 Each row shows, from left to right: `●` the worktree you are in (`○` one open in another tab), the Claude state in
 herdr (working, waiting for you, done), the branch and its folder, uncommitted changes, commits ahead `↑` and
 behind `↓` its upstream, and the PR with the result of its checks. The panel opens on the worktree you are in.
+Below 120 columns the preview moves under the list, and it switches back when the terminal grows again.
 
 | Key | Action |
 |-----|--------|
