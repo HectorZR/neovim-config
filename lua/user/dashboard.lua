@@ -86,7 +86,10 @@ end
 --- Section for snacks.dashboard: the panel as centered lines.
 function M.section()
   local data = rows()
-  table.insert(data, updates_row())
+  local updates = updates_row()
+  if updates then
+    table.insert(data, updates)
+  end
   watch_updates()
   local hello = greeting()
   local info = math.max(MIN_INFO, vim.fn.strdisplaywidth(hello))
