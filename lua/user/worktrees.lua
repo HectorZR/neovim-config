@@ -593,6 +593,40 @@ local function cell(text, width, hl)
   return { text .. (" "):rep(width - size), hl }
 end
 
+-- below this width the list side by side with the preview gets under 60 columns and starts cutting data
+local SIDE_BY_SIDE_COLUMNS = 120
+
+-- wider than the snacks default, and with more room for the list than for the preview
+local side_by_side_layout = {
+  layout = {
+    box = "horizontal",
+    width = 0.9,
+    min_width = 120,
+    height = 0.8,
+    {
+      box = "vertical",
+      border = true,
+      title = "{title} {live} {flags}",
+      { win = "input", height = 1, border = "bottom" },
+      { win = "list", border = "none" },
+    },
+    { win = "preview", title = "{preview}", border = true, width = 0.42 },
+  },
+}
+
+local stacked_layout = {
+  layout = {
+    box = "vertical",
+    width = 0.9,
+    height = 0.9,
+    border = true,
+    title = "{title} {live} {flags}",
+    { win = "input", height = 1, border = "bottom" },
+    { win = "list", border = "none" },
+    { win = "preview", title = "{preview}", height = 0.5, border = "top" },
+  },
+}
+
 --- Picker panel: <CR> switch, <C-n> new, <C-x> remove, <C-a> switch and focus Claude.
 --- Opens from `git worktree list` alone; everything slower is loaded in the background.
 function M.pick()
@@ -647,23 +681,11 @@ function M.pick()
         end
       end
     end,
-    -- wider than the default, and with more room for the list than for the preview
-    layout = {
-      layout = {
-        box = "horizontal",
-        width = 0.9,
-        min_width = 120,
-        height = 0.8,
-        {
-          box = "vertical",
-          border = true,
-          title = "{title} {live} {flags}",
-          { win = "input", height = 1, border = "bottom" },
-          { win = "list", border = "none" },
-        },
-        { win = "preview", title = "{preview}", border = true, width = 0.42 },
-      },
-    },
+    -- side by side when the terminal is wide enough, list above preview when it is not;
+    -- snacks picks again when the terminal is resized
+    layout = function()
+      return vim.deepcopy(vim.o.columns >= SIDE_BY_SIDE_COLUMNS and side_by_side_layout or stacked_layout)
+    end,
     -- one row per worktree: who is on it and what it is on the left, then fixed columns on the right
     -- (changes, commits ahead/behind, PR) so they line up whatever the branch name
     format = function(item)
