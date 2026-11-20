@@ -48,6 +48,7 @@ return {
     end,
     keys = {
       { "<leader>rc", review("add"), mode = { "n", "x" }, desc = "Add review comment" },
+      { "<leader>re", review("edit_at_cursor"), desc = "Edit review comment" },
       { "<leader>rd", review("delete_at_cursor"), desc = "Delete review comment" },
       {
         "<leader>rl",
@@ -172,6 +173,7 @@ return {
         { "<leader>rs", icon = review },
         { "<leader>rh", icon = review },
         { "<leader>rc", icon = review, mode = { "n", "x" } },
+        { "<leader>re", icon = review },
         { "<leader>rd", icon = review },
         { "<leader>rl", icon = review },
         { "<leader>rH", icon = review },

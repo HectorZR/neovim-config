@@ -22,6 +22,7 @@ local pad_ns = vim.api.nvim_create_namespace("user_review_pad")
 ---@field created integer
 ---@field sent? integer
 ---@field resolved? boolean
+---@field edited? integer
 
 -- ── storage ──────────────────────────────────────────────────────────────────
 
@@ -251,14 +252,8 @@ function M.add(line1, line2)
   )
 end
 
---- Delete the comment(s) on the cursor line.
-function M.delete_at_cursor()
-  local buf = vim.api.nvim_get_current_buf()
-  local wt = buf_context(buf)
-  if not wt then
-    return
-  end
-  M.sync(buf)
+--- Ids of the comments covering the cursor line.
+local function ids_at_cursor(buf)
   local row = vim.fn.line(".") - 1
   local ids = {}
   for _, m in ipairs(vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { details = true })) do
@@ -267,6 +262,18 @@ function M.delete_at_cursor()
       ids[marks[buf][m[1]]] = true
     end
   end
+  return ids
+end
+
+--- Delete the comment(s) on the cursor line.
+function M.delete_at_cursor()
+  local buf = vim.api.nvim_get_current_buf()
+  local wt = buf_context(buf)
+  if not wt then
+    return
+  end
+  M.sync(buf)
+  local ids = ids_at_cursor(buf)
   if vim.tbl_isempty(ids) then
     return vim.notify("No review comment on this line", vim.log.levels.INFO)
   end
@@ -277,6 +284,66 @@ function M.delete_at_cursor()
     end, M.load(wt))
   )
   M.render(buf)
+end
+
+--- Change the text of comment `id`. An edited comment counts as not sent, so the next send includes it.
+local function edit(wt, id, done)
+  local comment
+  for _, c in ipairs(M.load(wt)) do
+    if c.id == id then
+      comment = c
+    end
+  end
+  if not comment then
+    return
+  end
+  local loc = comment.lnum == comment.end_lnum and ("%s:%d"):format(comment.file, comment.lnum)
+    or ("%s:%d-%d"):format(comment.file, comment.lnum, comment.end_lnum)
+  Snacks.input({ prompt = "Edit comment " .. loc, default = comment.text }, function(text)
+    if text and vim.trim(text) ~= "" and text ~= comment.text then
+      -- reload: the file may have changed while the input was open
+      local comments = M.load(wt)
+      for _, c in ipairs(comments) do
+        if c.id == id then
+          c.text, c.edited, c.sent = text, os.time(), nil
+        end
+      end
+      M.save(wt, comments)
+      render_worktree(wt)
+    end
+    if done then
+      done()
+    end
+  end)
+end
+
+--- Edit the comment on the cursor line; asks which one when several cover it.
+function M.edit_at_cursor()
+  local buf = vim.api.nvim_get_current_buf()
+  local wt = buf_context(buf)
+  if not wt then
+    return
+  end
+  M.sync(buf)
+  local ids = ids_at_cursor(buf)
+  local found = vim.tbl_filter(function(c)
+    return ids[c.id]
+  end, M.load(wt))
+  if #found == 0 then
+    return vim.notify("No review comment on this line", vim.log.levels.INFO)
+  elseif #found == 1 then
+    return edit(wt, found[1].id)
+  end
+  vim.ui.select(found, {
+    prompt = "Edit which comment?",
+    format_item = function(c)
+      return (c.text:gsub("\n", " "))
+    end,
+  }, function(c)
+    if c then
+      edit(wt, c.id)
+    end
+  end)
 end
 
 --- Markdown prompt for the agent from a list of comments.
@@ -397,6 +464,7 @@ function M.pick()
   local keys = {
     ["<c-r>"] = { "review_resolve", mode = { "n", "i" }, desc = "Toggle resolved" },
     ["<c-x>"] = { "review_delete", mode = { "n", "i" }, desc = "Delete comment" },
+    ["<c-e>"] = { "review_edit", mode = { "n", "i" }, desc = "Edit comment" },
   }
   Snacks.picker.pick({
     title = "Review comments",
@@ -423,6 +491,15 @@ function M.pick()
         end)
         picker:close()
         M.pick()
+      end,
+      review_edit = function(picker, item)
+        if item then
+          picker:close()
+          -- once the picker is gone: closing it leaves insert mode, which would land in the input
+          vim.schedule(function()
+            edit(wt, item.comment.id, M.pick)
+          end)
+        end
       end,
       review_delete = function(picker, item)
         update(item, function(cs, id)

@@ -127,8 +127,9 @@ choosing a commit filters the files and the diff to it.
 | `<leader>rH` | History of current file |
 | `<leader>rP` | Diff a pull request in codediff |
 | `<leader>rc` | Add review comment on line/selection (n, x) |
+| `<leader>re` | Edit the review comment on this line (an edited comment goes out again with the next send) |
 | `<leader>rd` | Delete review comment on this line |
-| `<leader>rl` | List comments (`<C-r>` resolve, `<C-x>` delete) |
+| `<leader>rl` | List comments (`<C-e>` edit, `<C-r>` resolve, `<C-x>` delete) |
 
 Comments are stored outside the repo in `stdpath("cache")/review/<repo>/<worktree>/` and are deleted after
 14 days without changes.
